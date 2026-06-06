@@ -1,5 +1,7 @@
 import { useState } from "react";
 import ClinicQueue from "../Components/Home/ClinicQueue";
+import Navbar from "../Components/Navbar";
+import Footer from "../Components/Footer";  
 
 // ── Icons (inline SVG helpers) ──────────────────────────────────────────────
 const Icon = ({ d, size = 16, className = "" }) => (
@@ -18,12 +20,14 @@ const CalendarIcon = () => <Icon d="M3 4h18v18H3z M16 2v4 M8 2v4 M3 10h18" size=
 const SearchIcon = () => <Icon d="M11 19a8 8 0 100-16 8 8 0 000 16z M21 21l-4.35-4.35" size={14} />;
 const UserIcon = () => <Icon d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2 M12 11a4 4 0 100-8 4 4 0 000 8z" size={14} />;
 
-// ── Color palette (dark teal + gold + white) ─────────────────────────────────
 const TEAL = "#1a3c4e";
 const TEAL_DARK = "#122d3a";
 const GOLD = "#c9a227";
 const TEAL_MID = "#2d6a7f";
 const RED_LIVE = "#dc2626";
+
+// ── Color palette (dark teal + gold + white) ─────────────────────────────────
+
 
 // ── Sub-components ────────────────────────────────────────────────────────────
 
@@ -43,32 +47,32 @@ function TopBar() {
   );
 }
 
-function Navbar() {
-  const links = ["Home", "About", "Services", "Doctors", "Patient Info", "Patients", "Donate", "Contact"];
-  return (
-    <nav className="sticky top-0 z-50 shadow-md" style={{ background: TEAL }}>
-      <div className="max-w-7xl mx-auto px-4 py-2 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center overflow-hidden">
-            <span className="text-xs font-bold" style={{ color: TEAL }}>NH</span>
-          </div>
-          <div className="text-white leading-tight">
-            <div className="font-bold text-sm">National Hospital Galle</div>
-            <div className="text-xs opacity-75">Ministry of Health, Government of Sri Lanka</div>
-          </div>
-        </div>
-        <div className="hidden lg:flex items-center gap-1 text-sm">
-          {links.map((l, i) => (
-            <a key={l} href="#" className={`px-3 py-1 rounded text-white hover:bg-white/20 transition ${i === 0 ? "bg-white/20" : ""}`}>{l}</a>
-          ))}
-          <a href="#" className="ml-2 px-3 py-1 border border-white rounded text-white text-sm hover:bg-white/20 transition">Login</a>
-          <a href="#" className="px-3 py-1 border border-white rounded text-white text-sm hover:bg-white/20 transition">Register</a>
-          <a href="#" className="ml-2 px-4 py-1.5 rounded text-white text-sm font-semibold transition" style={{ background: GOLD }}>Book Appointment</a>
-        </div>
-      </div>
-    </nav>
-  );
-}
+// function Navbar() {
+//   const links = ["Home", "About", "Services", "Doctors", "Patient Info", "Patients", "Donate", "Contact"];
+//   return (
+//     <nav className="sticky top-0 z-50 shadow-md" style={{ background: TEAL }}>
+//       <div className="max-w-7xl mx-auto px-4 py-2 flex items-center justify-between">
+//         <div className="flex items-center gap-3">
+//           <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center overflow-hidden">
+//             <span className="text-xs font-bold" style={{ color: TEAL }}>NH</span>
+//           </div>
+//           <div className="text-white leading-tight">
+//             <div className="font-bold text-sm">National Hospital Galle</div>
+//             <div className="text-xs opacity-75">Ministry of Health, Government of Sri Lanka</div>
+//           </div>
+//         </div>
+//         <div className="hidden lg:flex items-center gap-1 text-sm">
+//           {links.map((l, i) => (
+//             <a key={l} href="#" className={`px-3 py-1 rounded text-white hover:bg-white/20 transition ${i === 0 ? "bg-white/20" : ""}`}>{l}</a>
+//           ))}
+//           <a href="#" className="ml-2 px-3 py-1 border border-white rounded text-white text-sm hover:bg-white/20 transition">Login</a>
+//           <a href="#" className="px-3 py-1 border border-white rounded text-white text-sm hover:bg-white/20 transition">Register</a>
+//           <a href="#" className="ml-2 px-4 py-1.5 rounded text-white text-sm font-semibold transition" style={{ background: GOLD }}>Book Appointment</a>
+//         </div>
+//       </div>
+//     </nav>
+//   );
+// }
 
 function HealthAlert() {
   return (
@@ -468,47 +472,47 @@ function ContactSection() {
   );
 }
 
-function Footer() {
-  const cols = [
-    {
-      title: "Hospital", links: ["Home", "About Us", "History", "Accreditation", "Annual Reports"],
-    },
-    {
-      title: "Services", links: ["OPD Services", "Inpatient Care", "Emergency Services", "Laboratory", "Radiology"],
-    },
-    {
-      title: "Patients", links: ["Book Appointment", "Find a Doctor", "Patient Rights", "Patient Portal", "Feedback"],
-    },
-  ];
-  return (
-    <footer className="text-white py-12 px-4" style={{ background: TEAL_DARK }}>
-      <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mb-10">
-          {/* Brand */}
-          <div>
-            <div className="font-bold text-lg mb-2">National Hospital Galle</div>
-            <p className="text-xs text-white/60 leading-relaxed mb-4">Southern Sri Lanka's premiere tertiary care institution, serving the community with compassion since 1949.</p>
-            <div className="text-xs text-white/40">© 2026 National Hospital Galle · Ministry of Health, Sri Lanka</div>
-          </div>
-          {cols.map((col) => (
-            <div key={col.title}>
-              <p className="font-semibold text-sm mb-4" style={{ color: GOLD }}>{col.title}</p>
-              <ul className="space-y-2">
-                {col.links.map((link) => (
-                  <li key={link}><a href="#" className="text-xs text-white/60 hover:text-white transition">{link}</a></li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-        <div className="border-t border-white/10 pt-6 flex flex-col md:flex-row justify-between items-center gap-2 text-xs text-white/40">
-          <span>National Hospital Galle · ISO Accredited · Tertiary Teaching Hospital</span>
-          <span>Privacy Policy · Terms of Use · Sitemap</span>
-        </div>
-      </div>
-    </footer>
-  );
-}
+// function Footer() {
+//   const cols = [
+//     {
+//       title: "Hospital", links: ["Home", "About Us", "History", "Accreditation", "Annual Reports"],
+//     },
+//     {
+//       title: "Services", links: ["OPD Services", "Inpatient Care", "Emergency Services", "Laboratory", "Radiology"],
+//     },
+//     {
+//       title: "Patients", links: ["Book Appointment", "Find a Doctor", "Patient Rights", "Patient Portal", "Feedback"],
+//     },
+//   ];
+//   return (
+//     <footer className="text-white py-12 px-4" style={{ background: TEAL_DARK }}>
+//       <div className="max-w-7xl mx-auto">
+//         <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mb-10">
+//           {/* Brand */}
+//           <div>
+//             <div className="font-bold text-lg mb-2">National Hospital Galle</div>
+//             <p className="text-xs text-white/60 leading-relaxed mb-4">Southern Sri Lanka's premiere tertiary care institution, serving the community with compassion since 1949.</p>
+//             <div className="text-xs text-white/40">© 2026 National Hospital Galle · Ministry of Health, Sri Lanka</div>
+//           </div>
+//           {cols.map((col) => (
+//             <div key={col.title}>
+//               <p className="font-semibold text-sm mb-4" style={{ color: GOLD }}>{col.title}</p>
+//               <ul className="space-y-2">
+//                 {col.links.map((link) => (
+//                   <li key={link}><a href="#" className="text-xs text-white/60 hover:text-white transition">{link}</a></li>
+//                 ))}
+//               </ul>
+//             </div>
+//           ))}
+//         </div>
+//         <div className="border-t border-white/10 pt-6 flex flex-col md:flex-row justify-between items-center gap-2 text-xs text-white/40">
+//           <span>National Hospital Galle · ISO Accredited · Tertiary Teaching Hospital</span>
+//           <span>Privacy Policy · Terms of Use · Sitemap</span>
+//         </div>
+//       </div>
+//     </footer>
+//   );
+// }
 
 // ── Main Export ───────────────────────────────────────────────────────────────
 export default function NationalHospitalGalle() {
