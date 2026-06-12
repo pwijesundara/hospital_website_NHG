@@ -3,6 +3,7 @@ import ClinicQueue from "../Components/Home/ClinicQueue";
 import Navbar from "../Components/Navbar";
 import Footer from "../Components/Footer";  
 
+
 // ── Icons (inline SVG helpers) ──────────────────────────────────────────────
 const Icon = ({ d, size = 16, className = "" }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className={className}>
@@ -31,21 +32,7 @@ const RED_LIVE = "#dc2626";
 
 // ── Sub-components ────────────────────────────────────────────────────────────
 
-function TopBar() {
-  return (
-    <div className="text-white text-xs py-1 px-4 flex flex-wrap justify-between items-center" style={{ background: TEAL_DARK }}>
-      <div className="flex items-center gap-4">
-        <span className="flex items-center gap-1"><PhoneIcon /><span>OPD: Mon–Fri 8AM–4AM (Emergency: 24hr)</span></span>
-        <span className="hidden md:inline">Kangaroo, Galle</span>
-      </div>
-      <div className="flex items-center gap-3">
-        <span>සිංහල</span>
-        <span>தமிழ்</span>
-        <span>Downloads</span>
-      </div>
-    </div>
-  );
-}
+
 
 // function Navbar() {
 //   const links = ["Home", "About", "Services", "Doctors", "Patient Info", "Patients", "Donate", "Contact"];
@@ -518,7 +505,7 @@ function ContactSection() {
 export default function NationalHospitalGalle() {
   return (
     <div className="font-sans text-gray-900 min-h-screen">
-      <TopBar />
+    
       <Navbar />
       <HealthAlert />
       <HeroSection />
