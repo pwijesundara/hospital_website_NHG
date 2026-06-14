@@ -12,10 +12,7 @@ const LANGUAGES = [
 
 const NAV_LINKS = [
   { label: "Home", to: "/" },
-  { label: "Services",     to: "/services" },
-  { label: "Doctors",      to: "/doctors" },
-  { label: "Donate",       to: "/donate" },
-  {
+   {
     label: "About",
     to: "#",
     dropdown: [
@@ -25,6 +22,11 @@ const NAV_LINKS = [
       { label: "Leadership",       to: "/about/leadership" },
     ],
   },
+  { label: "Services",     to: "/services" },
+  { label: "Doctors",      to: "/doctors" },
+  { label: "Donate",       to: "/donate" },
+  {label:'Publications', to: '/publications'},
+ 
   { label: "Contact Us",      to: "/contact" },
 ];
 
