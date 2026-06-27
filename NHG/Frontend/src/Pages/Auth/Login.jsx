@@ -90,14 +90,14 @@ export default function Login() {
               htmlFor="identifier"
               className="block text-xs font-semibold tracking-wide text-[#16243e] mb-1.5"
             >
-              NIC NUMBER OR EMAIL
+              EMAIL
             </label>
             <input
               type="text"
               id="identifier"
               value={identifier}
               onChange={(e) => setIdentifier(e.target.value)}
-              placeholder="Enter your NIC or email address"
+              placeholder="Enter email address"
               className="w-full px-4 py-2.5 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#16243e]/20 focus:border-[#16243e]"
               disabled={loading}
             />

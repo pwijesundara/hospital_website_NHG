@@ -4,14 +4,31 @@ import { Plus, ArrowRight } from 'lucide-react';
 import { registerUser } from '../../Services/authService';
 
 export default function Register() {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  // 1. Updated state to handle all required payload fields
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    nic: '',
+    dob: '',
+    mobile: '',
+    address: '',
+    email: '',
+    password: '',
+    confirmPassword: ''
+  });
+
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  // Helper to update form fields dynamically
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.id]: e.target.value
+    });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -19,7 +36,9 @@ export default function Register() {
     setSuccess('');
     setLoading(true);
 
-    if (!name || !email || !password || !confirmPassword) {
+    // 2. Validate all fields are filled
+    const { firstName, lastName, nic, dob, mobile, address, email, password, confirmPassword } = formData;
+    if (!firstName || !lastName || !nic || !dob || !mobile || !address || !email || !password || !confirmPassword) {
       setError('Please fill in all fields');
       setLoading(false);
       return;
@@ -38,7 +57,8 @@ export default function Register() {
     }
 
     try {
-      const data = await registerUser(name, email, password);
+      // 3. Pass the entire payload object to your service layer
+      const data = await registerUser(formData);
       
       setSuccess('Registration successful! Redirecting to login...');
       setTimeout(() => {
@@ -54,13 +74,12 @@ export default function Register() {
   };
 
   const handleGoogleSignUp = () => {
-    // Hook up to your Google OAuth flow
     console.log('Continue with Google');
   };
 
   return (
     <div className="min-h-screen bg-slate-100 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 w-full max-w-md">
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 w-full max-w-lg"> {/* Changed max-w-md to max-w-lg for space */}
         {/* Logo */}
         <div className="flex justify-center mb-4">
           <div className="w-12 h-12 rounded-full bg-[#16243e] flex items-center justify-center">
@@ -105,80 +124,130 @@ export default function Register() {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Full Name */}
+          
+          {/* First & Last Name row */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label htmlFor="firstName" className="block text-xs font-semibold tracking-wide text-[#16243e] mb-1.5">FIRST NAME</label>
+              <input
+                type="text"
+                id="firstName"
+                value={formData.firstName}
+                onChange={handleChange}
+                placeholder="Kamal"
+                className="w-full px-4 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#16243e]/20 focus:border-[#16243e]"
+                disabled={loading}
+              />
+            </div>
+            <div>
+              <label htmlFor="lastName" className="block text-xs font-semibold tracking-wide text-[#16243e] mb-1.5">LAST NAME</label>
+              <input
+                type="text"
+                id="lastName"
+                value={formData.lastName}
+                onChange={handleChange}
+                placeholder="Perera"
+                className="w-full px-4 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#16243e]/20 focus:border-[#16243e]"
+                disabled={loading}
+              />
+            </div>
+          </div>
+
+          {/* NIC & DOB row */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label htmlFor="nic" className="block text-xs font-semibold tracking-wide text-[#16243e] mb-1.5">NIC NUMBER</label>
+              <input
+                type="text"
+                id="nic"
+                value={formData.nic}
+                onChange={handleChange}
+                placeholder="200012345678"
+                className="w-full px-4 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#16243e]/20 focus:border-[#16243e]"
+                disabled={loading}
+              />
+            </div>
+            <div>
+              <label htmlFor="dob" className="block text-xs font-semibold tracking-wide text-[#16243e] mb-1.5">DATE OF BIRTH</label>
+              <input
+                type="date"
+                id="dob"
+                value={formData.dob}
+                onChange={handleChange}
+                className="w-full px-4 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#16243e]/20 focus:border-[#16243e]"
+                disabled={loading}
+              />
+            </div>
+          </div>
+
+          {/* Mobile & Email row */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label htmlFor="mobile" className="block text-xs font-semibold tracking-wide text-[#16243e] mb-1.5">MOBILE NUMBER</label>
+              <input
+                type="tel"
+                id="mobile"
+                value={formData.mobile}
+                onChange={handleChange}
+                placeholder="0771234567"
+                className="w-full px-4 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#16243e]/20 focus:border-[#16243e]"
+                disabled={loading}
+              />
+            </div>
+            <div>
+              <label htmlFor="email" className="block text-xs font-semibold tracking-wide text-[#16243e] mb-1.5">EMAIL ADDRESS</label>
+              <input
+                type="email"
+                id="email"
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="kamal@example.com"
+                className="w-full px-4 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#16243e]/20 focus:border-[#16243e]"
+                disabled={loading}
+              />
+            </div>
+          </div>
+
+          {/* Address */}
           <div>
-            <label
-              htmlFor="name"
-              className="block text-xs font-semibold tracking-wide text-[#16243e] mb-1.5"
-            >
-              FULL NAME
-            </label>
+            <label htmlFor="address" className="block text-xs font-semibold tracking-wide text-[#16243e] mb-1.5">ADDRESS</label>
             <input
               type="text"
-              id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Enter your full name"
-              className="w-full px-4 py-2.5 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#16243e]/20 focus:border-[#16243e]"
+              id="address"
+              value={formData.address}
+              onChange={handleChange}
+              placeholder="Galle"
+              className="w-full px-4 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#16243e]/20 focus:border-[#16243e]"
               disabled={loading}
             />
           </div>
 
-          {/* Email */}
-          <div>
-            <label
-              htmlFor="email"
-              className="block text-xs font-semibold tracking-wide text-[#16243e] mb-1.5"
-            >
-              EMAIL ADDRESS
-            </label>
-            <input
-              type="email"
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter your email address"
-              className="w-full px-4 py-2.5 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#16243e]/20 focus:border-[#16243e]"
-              disabled={loading}
-            />
-          </div>
-
-          {/* Password */}
-          <div>
-            <label
-              htmlFor="password"
-              className="block text-xs font-semibold tracking-wide text-[#16243e] mb-1.5"
-            >
-              PASSWORD
-            </label>
-            <input
-              type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Create a password"
-              className="w-full px-4 py-2.5 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#16243e]/20 focus:border-[#16243e]"
-              disabled={loading}
-            />
-          </div>
-
-          {/* Confirm Password */}
-          <div>
-            <label
-              htmlFor="confirmPassword"
-              className="block text-xs font-semibold tracking-wide text-[#16243e] mb-1.5"
-            >
-              CONFIRM PASSWORD
-            </label>
-            <input
-              type="password"
-              id="confirmPassword"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              placeholder="Confirm your password"
-              className="w-full px-4 py-2.5 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#16243e]/20 focus:border-[#16243e]"
-              disabled={loading}
-            />
+          {/* Passwords row */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label htmlFor="password" className="block text-xs font-semibold tracking-wide text-[#16243e] mb-1.5">PASSWORD</label>
+              <input
+                type="password"
+                id="password"
+                value={formData.password}
+                onChange={handleChange}
+                placeholder="Create password"
+                className="w-full px-4 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#16243e]/20 focus:border-[#16243e]"
+                disabled={loading}
+              />
+            </div>
+            <div>
+              <label htmlFor="confirmPassword" className="block text-xs font-semibold tracking-wide text-[#16243e] mb-1.5">CONFIRM PASSWORD</label>
+              <input
+                type="password"
+                id="confirmPassword"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                placeholder="Confirm password"
+                className="w-full px-4 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#16243e]/20 focus:border-[#16243e]"
+                disabled={loading}
+              />
+            </div>
           </div>
 
           {/* Submit */}
