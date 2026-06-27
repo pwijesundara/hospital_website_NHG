@@ -1,71 +1,48 @@
 import { useState, useRef, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 
-const TEAL = "#1a3c4e";
-const GOLD = "#c9a227";
+const TEAL = "#0A2E30";
+const GOLD = "#F9A825";
 
 const LANGUAGES = [
-  { code: "en", label: "EN", full: "English" },
-  { code: "si", label: "සි",  full: "සිංහල" },
-  { code: "ta", label: "த",  full: "தமிழ்" },
+  { code: "en", label: "EN" },
+  { code: "si", label: "සි" },
+  { code: "ta", label: "த" },
 ];
 
 const NAV_LINKS = [
   { label: "Home", to: "/" },
-   {
+  {
     label: "About",
     to: "#",
     dropdown: [
-      { label: "History",          to: "/about/history" },
+      { label: "History", to: "/about/history" },
       { label: "Vision & Mission", to: "/about/vision-mission" },
-      { label: "Overview",         to: "/about/overview" },
-      { label: "Leadership",       to: "/about/leadership" },
+      { label: "Overview", to: "/about/overview" },
+      { label: "Leadership", to: "/about/leadership" },
     ],
   },
-  { label: "Services",     to: "/services" },
-  { label: "Doctors",      to: "/doctors" },
-  { label: "Donate",       to: "/donate" },
-  {label:'Publications', to: '/publications'},
- 
-  { label: "Contact Us",      to: "/contact" },
+  { label: "Services", to: "/services" },
+  { label: "Doctors", to: "/doctors" },
+  { label: "Donate", to: "/donate" },
+  { label: "Publications", to: "/publications" },
+  { label: "Dashboard", to: "/dashboard" },
+  { label: "Contact Us", to: "/contact" },
 ];
-
-// ── Language switcher ────────────────────────────────────────────────────────
-function LangSwitcher({ activeLang, setActiveLang, dark = false }) {
-  const others = LANGUAGES.filter((l) => l.code !== activeLang);
-  return (
-    <div className="flex items-center gap-1">
-      {others.map((l) => (
-        <button
-          key={l.code}
-          onClick={() => setActiveLang(l.code)}
-          title={l.full}
-          className={`px-2 py-0.5 rounded text-xs font-semibold transition-colors duration-150 ${
-            dark
-              ? "text-white/70 hover:text-white hover:bg-white/15"
-              : "text-white/60 hover:text-white hover:bg-white/10"
-          }`}
-        >
-          {l.label}
-        </button>
-      ))}
-    </div>
-  );
-}
 
 // ── Desktop dropdown ─────────────────────────────────────────────────────────
 function DesktopDropdown({ items, isOpen }) {
   if (!isOpen) return null;
   return (
     <div
-      className="absolute top-full left-0 mt-1 w-48 rounded shadow-lg overflow-hidden z-50"
-      style={{ background: TEAL, border: "1px solid rgba(255,255,255,0.15)" }}
+      className="absolute top-full left-0 mt-2 w-48 rounded-lg overflow-hidden z-50 border border-white/10 shadow-xl"
+      style={{ background: TEAL }}
     >
       {items.map((item) => (
         <Link
           key={item.label}
           to={item.to}
-          className="block px-4 py-2 text-sm text-white hover:bg-white/20 transition"
+          className="block px-4 py-2.5 text-sm text-white/90 hover:bg-white/10 hover:text-white transition-colors"
         >
           {item.label}
         </Link>
@@ -85,7 +62,7 @@ function DesktopNavItem({ link }) {
     link.to === "/"
       ? location.pathname === "/"
       : (location.pathname.startsWith(link.to) && link.to !== "#") ||
-        (hasDropdown && link.dropdown.some((child) => location.pathname.startsWith(child.to)));
+        (hasDropdown && link.dropdown.some((c) => location.pathname.startsWith(c.to)));
 
   useEffect(() => {
     if (!hasDropdown) return;
@@ -103,13 +80,13 @@ function DesktopNavItem({ link }) {
       <div ref={ref} className="relative">
         <button
           onClick={() => setOpen((p) => !p)}
-          className={`flex items-center gap-1 px-3 py-1 rounded text-white hover:bg-white/20 transition text-sm ${isActive ? "bg-white/20" : ""}`}
           aria-haspopup="true"
           aria-expanded={open}
+          className={`flex items-center gap-1 px-3 py-1.5 rounded-md text-sm font-medium text-white/90 hover:text-white hover:bg-white/10 transition ${isActive ? "bg-white/15 text-white font-semibold" : ""}`}
         >
           {link.label}
           <svg
-            className={`w-3.5 h-3.5 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+            className={`w-3.5 h-3.5 opacity-70 transition-transform ${open ? "rotate-180" : ""}`}
             fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}
           >
             <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
@@ -123,15 +100,15 @@ function DesktopNavItem({ link }) {
   return (
     <Link
       to={link.to}
-      className={`px-3 py-1 rounded text-white hover:bg-white/20 transition text-sm ${isActive ? "bg-white/20" : ""}`}
+      className={`px-3 py-1.5 rounded-md text-sm font-medium text-white/90 hover:text-white hover:bg-white/10 transition ${isActive ? "bg-white/15 text-white font-semibold" : ""}`}
     >
       {link.label}
     </Link>
   );
 }
 
-// ── Mobile nav item ──────────────────────────────────────────────────────────
-function MobileNavItem({ link, onNavigate }) {
+// ── Mobile drawer item ───────────────────────────────────────────────────────
+function DrawerNavItem({ link, onClose }) {
   const [open, setOpen] = useState(false);
   const location = useLocation();
   const hasDropdown = Boolean(link.dropdown);
@@ -140,33 +117,31 @@ function MobileNavItem({ link, onNavigate }) {
     link.to === "/"
       ? location.pathname === "/"
       : (location.pathname.startsWith(link.to) && link.to !== "#") ||
-        (hasDropdown && link.dropdown.some((child) => location.pathname.startsWith(child.to)));
+        (hasDropdown && link.dropdown.some((c) => location.pathname.startsWith(c.to)));
 
   if (hasDropdown) {
     return (
       <div>
         <button
           onClick={() => setOpen((p) => !p)}
-          className={`w-full flex items-center justify-between px-5 py-3 text-sm text-white rounded-lg transition-colors duration-150 ${
-            isActive ? "bg-white/15" : "hover:bg-white/10"
-          }`}
+          className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm text-white/90 transition-colors ${isActive ? "bg-white/10 text-white font-semibold" : "hover:bg-white/5"}`}
         >
-          <span className="font-medium">{link.label}</span>
+          <span>{link.label}</span>
           <svg
-            className={`w-4 h-4 opacity-60 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+            className={`w-4 h-4 opacity-60 transition-transform ${open ? "rotate-180" : ""}`}
             fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}
           >
             <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
           </svg>
         </button>
         {open && (
-          <div className="mt-0.5 ml-3 pl-3 border-l border-white/20">
+          <div className="ml-3 pl-3 border-l border-white/10 mt-1 flex flex-col gap-0.5">
             {link.dropdown.map((item) => (
               <Link
                 key={item.label}
                 to={item.to}
-                onClick={onNavigate}
-                className="block px-3 py-2.5 text-sm text-white/75 hover:text-white hover:bg-white/10 rounded-lg transition-colors duration-150"
+                onClick={onClose}
+                className="block px-3 py-2 text-sm text-white/70 hover:text-white hover:bg-white/5 rounded-md transition-all"
               >
                 {item.label}
               </Link>
@@ -180,10 +155,8 @@ function MobileNavItem({ link, onNavigate }) {
   return (
     <Link
       to={link.to}
-      onClick={onNavigate}
-      className={`block px-5 py-3 text-sm font-medium text-white rounded-lg transition-colors duration-150 ${
-        isActive ? "bg-white/15" : "hover:bg-white/10"
-      }`}
+      onClick={onClose}
+      className={`block px-3 py-2.5 rounded-lg text-sm transition-colors ${isActive ? "bg-white/10 text-white font-semibold" : "text-white/90 hover:bg-white/5"}`}
     >
       {link.label}
     </Link>
@@ -192,211 +165,237 @@ function MobileNavItem({ link, onNavigate }) {
 
 // ── Navbar ───────────────────────────────────────────────────────────────────
 export default function Navbar() {
-  const [menuOpen, setMenuOpen]   = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const [activeLang, setActiveLang] = useState("en");
   const location = useLocation();
 
-  const currentLang = LANGUAGES.find((l) => l.code === activeLang);
+  const closeDrawer = () => setDrawerOpen(false);
 
-  useEffect(() => { setMenuOpen(false); }, [location.pathname]);
+  useEffect(() => { setDrawerOpen(false); }, [location.pathname]);
 
   useEffect(() => {
-    document.body.style.overflow = menuOpen ? "hidden" : "";
+    document.body.style.overflow = drawerOpen ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
-  }, [menuOpen]);
+  }, [drawerOpen]);
+
+  const currentLang = LANGUAGES.find((l) => l.code === activeLang);
+  const otherLangs = LANGUAGES.filter((l) => l.code !== activeLang);
 
   return (
     <>
-      <nav className="sticky top-0 z-50 shadow-md" style={{ background: TEAL }}>
-        <div className="max-w-7xl mx-auto px-4 py-2 flex items-center justify-between">
+      <nav
+        className="sticky top-0 z-50 shadow-lg border-b border-white/5 w-full"
+        style={{ background: TEAL }}
+      >
+        <div className="px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center gap-3">
 
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shrink-0">
-              <span className="text-xs font-bold" style={{ color: TEAL }}>NH</span>
+          <Link to="/" className="flex items-center gap-2.5 shrink-0">
+            <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-white flex items-center justify-center shadow-md shrink-0">
+              <span className="text-[10px] font-black" style={{ color: TEAL }}>NHG</span>
             </div>
             <div className="text-white leading-tight">
-              <div className="font-bold text-sm">National Hospital Galle</div>
-              <div className="text-xs opacity-75 hidden sm:block">
+              <div className="font-extrabold text-sm sm:text-base tracking-wide">
+                National Hospital Galle
+              </div>
+              <div className="text-[10px] opacity-60 hidden md:block">
                 Ministry of Health, Government of Sri Lanka
               </div>
             </div>
           </Link>
 
-          {/* Desktop nav */}
-          <div className="hidden lg:flex items-center gap-1">
+          {/* Desktop nav links — only xl+ to avoid overflow */}
+          <div className="hidden xl:flex flex-1 justify-center items-center gap-0.5">
             {NAV_LINKS.map((link) => (
               <DesktopNavItem key={link.label} link={link} />
             ))}
-
-            {/* Separator */}
-            <div className="w-px h-5 bg-white/20 mx-1" />
-
-            {/* Language switcher — desktop */}
-            <div className="flex items-center gap-1 mr-1">
-              <span className="text-xs font-semibold text-white px-2 py-0.5 rounded bg-white/15">
-                {currentLang.label}
-              </span>
-              <LangSwitcher activeLang={activeLang} setActiveLang={setActiveLang} />
-            </div>
-
-            {/* Auth */}
-            <div className="flex items-center gap-2 ml-1">
-              <Link
-                to="/signin"
-                className="px-3 py-1 border border-white rounded text-white text-sm hover:bg-white/20 transition"
-              >
-                Login
-              </Link>
-              <Link
-                to="/register"
-                className="px-3 py-1 border border-white rounded text-white text-sm hover:bg-white/20 transition"
-              >
-                Register
-              </Link>
-              
-              {/* Upgraded Button with Micro-interactions */}
-              <Link
-                to="/book-appointment"
-                className="px-4 py-1.5 rounded text-white text-sm font-semibold transition-all duration-300 transform hover:-translate-y-0.5 hover:brightness-110 hover:shadow-md hover:shadow-black/20 active:translate-y-0"
-                style={{ background: GOLD }}
-              >
-                Book Appointment
-              </Link>
-            </div>
           </div>
 
-          {/* Mobile right header actions */}
-          <div className="lg:hidden flex items-center gap-2">
+          {/* Desktop right actions */}
+          <div className="hidden xl:flex items-center gap-2 ml-auto shrink-0">
+            {/* Language switcher */}
+            <div className="flex items-center gap-1">
+              <span className="text-[10px] font-bold text-white bg-white/20 px-1.5 py-0.5 rounded">
+                {currentLang.label}
+              </span>
+              {otherLangs.map((l) => (
+                <button
+                  key={l.code}
+                  onClick={() => setActiveLang(l.code)}
+                  className="text-xs text-white/60 hover:text-white px-1.5 py-0.5 rounded hover:bg-white/10 transition"
+                >
+                  {l.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Register */}
+            <Link
+              to="/register"
+              className="px-3 py-1.5 border border-white/30 rounded-lg text-white text-sm font-medium hover:bg-white/10 transition"
+            >
+              Register
+            </Link>
+
+            {/* Login */}
+            <Link
+              to="/signin"
+              className="px-3 py-1.5 border border-white/30 rounded-lg text-white text-sm font-medium hover:bg-white/10 transition"
+            >
+              Login
+            </Link>
+
+            {/* Book Appointment */}
             <Link
               to="/book-appointment"
-              className="hidden sm:block px-3 py-1.5 rounded text-white text-xs font-semibold transition-all duration-300 hover:brightness-110 active:scale-95"
+              className="px-4 py-2 rounded-lg text-white text-sm font-bold hover:brightness-110 active:scale-95 transition whitespace-nowrap"
+              style={{ background: GOLD }}
+            >
+              Book Appointment
+            </Link>
+          </div>
+
+          {/* Tablet (lg) — show Register + Login + Book + hamburger, hide full nav */}
+          <div className="hidden lg:flex xl:hidden items-center gap-2 ml-auto shrink-0">
+            <Link
+              to="/register"
+              className="px-3 py-1.5 border border-white/30 rounded-lg text-white text-xs font-medium hover:bg-white/10 transition"
+            >
+              Register
+            </Link>
+            <Link
+              to="/signin"
+              className="px-3 py-1.5 border border-white/30 rounded-lg text-white text-xs font-medium hover:bg-white/10 transition"
+            >
+              Login
+            </Link>
+            <Link
+              to="/book-appointment"
+              className="px-3 py-1.5 rounded-lg text-white text-xs font-bold whitespace-nowrap"
               style={{ background: GOLD }}
             >
               Book
             </Link>
             <button
-              onClick={() => setMenuOpen((p) => !p)}
-              className="text-white p-2 rounded hover:bg-white/10 transition"
-              aria-label={menuOpen ? "Close menu" : "Open menu"}
+              onClick={() => setDrawerOpen(true)}
+              className="p-2 rounded-lg text-white hover:bg-white/10 transition"
+              aria-label="Open menu"
             >
-              {menuOpen ? (
-                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              ) : (
-                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-              )}
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
             </button>
           </div>
+
+          {/* Mobile — Book + hamburger only */}
+          <div className="flex lg:hidden items-center gap-2 ml-auto shrink-0">
+            <Link
+              to="/book-appointment"
+              className="px-3 py-1.5 rounded-lg text-white text-xs font-bold whitespace-nowrap"
+              style={{ background: GOLD }}
+            >
+              Book
+            </Link>
+            <button
+              onClick={() => setDrawerOpen(true)}
+              className="p-2 rounded-lg text-white hover:bg-white/10 transition"
+              aria-label="Open menu"
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+          </div>
+
         </div>
       </nav>
 
-      {/* ── Backdrop ── */}
-      <div
-        onClick={() => setMenuOpen(false)}
-        className={`lg:hidden fixed inset-0 z-40 bg-black/40 transition-opacity duration-300 ${
-          menuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
-        }`}
-      />
+      {/* Overlay */}
+      {drawerOpen && (
+        <div
+          className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm"
+          onClick={closeDrawer}
+        />
+      )}
 
-      {/* ── Right slide-in panel ── */}
-      <div
-        className={`lg:hidden fixed top-0 right-0 h-full w-72 z-50 flex flex-col shadow-2xl transition-transform duration-300 ease-in-out ${
-          menuOpen ? "translate-x-0" : "translate-x-full"
-        }`}
+      {/* Right-side drawer */}
+      <aside
+        className={`fixed top-0 right-0 h-full w-72 z-50 flex flex-col shadow-2xl transition-transform duration-300 ease-in-out ${drawerOpen ? "translate-x-0" : "translate-x-full"}`}
         style={{ background: TEAL }}
       >
-        {/* Panel header */}
-        <div
-          className="flex items-center justify-between px-5 py-4"
-          style={{ borderBottom: "1px solid rgba(255,255,255,0.12)" }}
-        >
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center shrink-0">
-              <span className="text-xs font-bold" style={{ color: TEAL }}>NH</span>
+        {/* Drawer header */}
+        <div className="flex items-center justify-between px-4 py-4 border-b border-white/10">
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-full bg-white flex items-center justify-center">
+              <span className="text-[8px] font-black" style={{ color: TEAL }}>NHG</span>
             </div>
-            <span className="text-white font-semibold text-sm">Menu</span>
+            <span className="text-white text-sm font-semibold">Menu</span>
           </div>
           <button
-            onClick={() => setMenuOpen(false)}
-            className="text-white/70 hover:text-white p-1 rounded hover:bg-white/10 transition"
+            onClick={closeDrawer}
+            className="p-1.5 rounded-lg text-white/70 hover:text-white hover:bg-white/10 transition"
             aria-label="Close menu"
           >
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
 
         {/* Nav links */}
-        <div className="flex-1 overflow-y-auto px-3 py-4 flex flex-col gap-0.5">
+        <div className="flex-1 overflow-y-auto px-3 py-4 flex flex-col gap-1">
           {NAV_LINKS.map((link) => (
-            <MobileNavItem
-              key={link.label}
-              link={link}
-              onNavigate={() => setMenuOpen(false)}
-            />
+            <DrawerNavItem key={link.label} link={link} onClose={closeDrawer} />
           ))}
         </div>
 
-        {/* Language switcher — mobile panel */}
-        <div
-          className="px-5 py-4"
-          style={{ borderTop: "1px solid rgba(255,255,255,0.12)" }}
-        >
-          <p className="text-xs text-white/40 uppercase tracking-widest font-semibold mb-2">Language</p>
-          <div className="flex items-center gap-2">
-            {LANGUAGES.map((l) => (
+        {/* Drawer footer */}
+        <div className="px-4 py-4 border-t border-white/10 flex flex-col gap-2">
+          {/* Language */}
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-[10px] font-bold text-white bg-white/20 px-1.5 py-0.5 rounded">
+              {currentLang.label}
+            </span>
+            {otherLangs.map((l) => (
               <button
                 key={l.code}
                 onClick={() => setActiveLang(l.code)}
-                className={`flex-1 py-1.5 rounded text-sm font-semibold transition-colors duration-150 ${
-                  activeLang === l.code
-                    ? "bg-white text-teal-900"
-                    : "text-white/70 border border-white/25 hover:bg-white/10 hover:text-white"
-                }`}
+                className="text-xs text-white/60 hover:text-white px-1.5 py-0.5 rounded hover:bg-white/10 transition"
               >
-                {l.full}
+                {l.label}
               </button>
             ))}
           </div>
-        </div>
 
-        {/* Auth & Primary Panel Actions */}
-        <div
-          className="px-4 py-5 flex flex-col gap-2.5"
-          style={{ borderTop: "1px solid rgba(255,255,255,0.12)" }}
-        >
-          {/* Upgraded Mobile Panel Action Button */}
+          {/* Register */}
+          <Link
+            to="/register"
+            onClick={closeDrawer}
+            className="block text-center px-4 py-2 border border-white/30 rounded-lg text-white text-sm font-medium hover:bg-white/10 transition"
+          >
+            Register
+          </Link>
+
+          {/* Login */}
+          <Link
+            to="/signin"
+            onClick={closeDrawer}
+            className="block text-center px-4 py-2 border border-white/30 rounded-lg text-white text-sm font-medium hover:bg-white/10 transition"
+          >
+            Login
+          </Link>
+
+          {/* Book Appointment */}
           <Link
             to="/book-appointment"
-            onClick={() => setMenuOpen(false)}
-            className="w-full text-center py-2.5 rounded text-white text-sm font-bold transition-all duration-300 hover:brightness-110 hover:shadow-lg active:scale-[0.99]"
+            onClick={closeDrawer}
+            className="block text-center px-4 py-2 rounded-lg text-white text-sm font-bold hover:brightness-110 transition"
             style={{ background: GOLD }}
           >
             Book Appointment
           </Link>
-          <div className="flex gap-2">
-            <Link
-              to="/signin"
-              onClick={() => setMenuOpen(false)}
-              className="flex-1 text-center py-2 border border-white/40 rounded text-white/80 text-sm hover:bg-white/10 hover:text-white transition"
-            >
-              Login
-            </Link>
-            <Link
-              to="/register"
-              onClick={() => setMenuOpen(false)}
-              className="flex-1 text-center py-2 border border-white/40 rounded text-white/80 text-sm hover:bg-white/10 hover:text-white transition"
-            >
-              Register
-            </Link>
-          </div>
         </div>
-      </div>
+      </aside>
     </>
   );
 }

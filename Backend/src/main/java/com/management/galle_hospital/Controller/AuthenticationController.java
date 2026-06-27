@@ -1,6 +1,8 @@
 package com.management.galle_hospital.Controller;
 
 
+import com.management.galle_hospital.Payload.DoctorRegistrationRequest;
+import com.management.galle_hospital.Payload.PatientRegistrationRequest;
 import com.management.galle_hospital.Payload.UserLoginRequest;
 import com.management.galle_hospital.Payload.UserRegisterRequest;
 import com.management.galle_hospital.Service.UserService;
@@ -22,6 +24,16 @@ public class AuthenticationController {
     @PostMapping("/register")
     public ResponseEntity<Map<String, String>> register(@RequestBody UserRegisterRequest request) {
         return userService.register(request);
+    }
+
+    @PostMapping("/patient/register")
+    public ResponseEntity<Map<String, String>> registerPatient(@RequestBody PatientRegistrationRequest request) {
+        return userService.registerPatient(request);
+    }
+
+    @PostMapping("/doctor/register")
+    public ResponseEntity<Map<String, String>> registerDoctor(@RequestBody DoctorRegistrationRequest request) {
+        return userService.registerDoctor(request);
     }
 
     @PostMapping({"/login", "/signin"})
