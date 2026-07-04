@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { Plus, ArrowRight, X } from "lucide-react";
+import { Plus, X } from "lucide-react";
 import { loginUser } from "../../Services/authService";
 
 export default function Login({ onClose, onSwitchToRegister }) {
@@ -29,11 +29,11 @@ export default function Login({ onClose, onSwitchToRegister }) {
 
       // save logged user
       localStorage.setItem("authData", JSON.stringify(data));
-      
+      window.dispatchEvent(new Event("authDataChanged"));
 
       if (onClose) onClose();
 
-      navigate("/");
+      navigate("/dashboard");
     } catch (err) {
       setError(err.message || "Login failed");
     } finally {

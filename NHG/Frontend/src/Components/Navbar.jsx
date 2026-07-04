@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import Login from "../Pages/Auth/Login";
 import Register from "../Pages/Auth/Register";
+import { getAuthData } from "../Utils/auth";
 
 const TEAL = "#0A2E30";
 const GOLD = "#F9A825";
@@ -28,7 +29,7 @@ const NAV_LINKS = [
   { label: "Doctors", to: "/doctors" },
   { label: "Donate", to: "/donate" },
   { label: "Publications", to: "/publications" },
-  { label: "Dashboard", to: "/dashboard" },
+  { label: "Dashboard", to: "/dashboard", requiresAuth: true },
   { label: "Contact Us", to: "/contact" },
 ];
 
@@ -176,6 +177,7 @@ export default function Navbar() {
   const location = useLocation();
   const [loginOpen, setLoginOpen] = useState(false);
   const [authMode, setAuthMode] = useState("login");
+  const [authData, setAuthData] = useState(getAuthData);
 
   const closeDrawer = () => setDrawerOpen(false);
 
@@ -190,7 +192,24 @@ export default function Navbar() {
     };
   }, [drawerOpen]);
 
+  useEffect(() => {
+    const syncAuth = () => setAuthData(getAuthData());
+    window.addEventListener("storage", syncAuth);
+    window.addEventListener("authDataChanged", syncAuth);
+    return () => {
+      window.removeEventListener("storage", syncAuth);
+      window.removeEventListener("authDataChanged", syncAuth);
+    };
+  }, []);
+
+  useEffect(() => {
+    setAuthData(getAuthData());
+  }, [location.pathname]);
+
   const currentLang = LANGUAGES.find((l) => l.code === activeLang);
+  const visibleNavLinks = NAV_LINKS.filter(
+    (link) => !link.requiresAuth || Boolean(authData)
+  );
   const otherLangs = LANGUAGES.filter((l) => l.code !== activeLang);
 
   return (
@@ -219,7 +238,7 @@ export default function Navbar() {
 
           {/* Desktop nav */}
           <div className="hidden xl:flex flex-1 justify-center gap-0.5">
-            {NAV_LINKS.map((link) => (
+            {visibleNavLinks.map((link) => (
               <DesktopNavItem key={link.label} link={link} />
             ))}
           </div>
@@ -325,7 +344,7 @@ export default function Navbar() {
         style={{ background: TEAL }}
       >
         <div className="p-4 text-white">
-          {NAV_LINKS.map((link) => (
+          {visibleNavLinks.map((link) => (
             <DrawerNavItem
               key={link.label}
               link={link}
