@@ -3,7 +3,7 @@ import Navbar from "../Components/Navbar";
 import Footer from "../Components/Footer";
 
 // ── Data ────────────────────────────────────────────────────────────────────
-
+// comment
 const departments = [
   { value: "",          label: "Select department" },
   { value: "emergency",    label: "Emergency & Critical Care" },
