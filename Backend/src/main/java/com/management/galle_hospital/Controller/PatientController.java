@@ -2,6 +2,7 @@ package com.management.galle_hospital.Controller;
 
 import com.management.galle_hospital.Model.Patient;
 import com.management.galle_hospital.Payload.PatientUpdateRequest;
+import com.management.galle_hospital.Service.LabReportService;
 import com.management.galle_hospital.Service.PatientService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class PatientController {
     private final PatientService patientService;
+    private final LabReportService labReportService;
 
     @GetMapping
     public List<Patient> getAllPatients() {
@@ -45,5 +47,15 @@ public class PatientController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Map<String, String>> deletePatient(@PathVariable Long id) {
         return patientService.deletePatient(id);
+    }
+
+    @GetMapping("/{id}/lab-reports")
+    public ResponseEntity<?> getLabReports(@PathVariable Long id) {
+        return labReportService.getReportsByPatientId(id);
+    }
+
+    @GetMapping("/lab-reports/{reportId}/pdf")
+    public ResponseEntity<?> downloadLabReport(@PathVariable Long reportId) {
+        return labReportService.downloadReport(reportId);
     }
 }

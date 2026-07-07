@@ -4,7 +4,7 @@ public enum TITLE {
 
     MR,
     MRS,
-    MS,
+    MISS,
     DR,
     PROF
 }

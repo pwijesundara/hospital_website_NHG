@@ -11,5 +11,7 @@ public enum Role {
 
     CONSULTANT,
 
-    NURSE
+    NURSE,
+
+    LAB
 }
