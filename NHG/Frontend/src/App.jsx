@@ -1,13 +1,11 @@
 
-import {BrowserRouter as Router,Routes,Route} from 'react-router-dom';
+import { BrowserRouter as Router, Navigate, Routes, Route } from 'react-router-dom';
 
 import './App.css'
 // Layout
 import DashboardLayout from "./Layout/DashboardLayout";
 
 import HomePage from "./Pages/home";
-import LoginPage from "./Pages/Auth/Login";
-import RegisterPage from "./Pages/Auth/Register";
 import VisionPage from "./Pages/About/Vision";
 import OverviewPage from "./Pages/About/Overview";
 import HistoryPage from "./Pages/About/History";
@@ -23,6 +21,31 @@ import DashboardHome from './Pages/Dashboard/DashboardHome';
 import DoctorPage from './Pages/Dashboard/DoctorPage';
 import ClinicPage from './Pages/Dashboard/ClinicPage';
 import PatientPage from './Pages/Dashboard/PatientPage';
+import { getAuthData, hasRole, ROLE } from './Utils/auth';
+
+function ProtectedDashboard() {
+  const authData = getAuthData();
+
+  if (!authData) {
+    return <Navigate to="/" replace />;
+  }
+
+  return <DashboardLayout />;
+}
+
+function RoleRoute({ allowedRoles, children }) {
+  const authData = getAuthData();
+
+  if (!authData) {
+    return <Navigate to="/" replace />;
+  }
+
+  if (!hasRole(allowedRoles, authData.role)) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  return children;
+}
 
 function App() {
 
@@ -30,11 +53,8 @@ function App() {
     <>
       <Router>
         <Routes>
-
+       
         <Route path="/" element={<HomePage />} />
-        <Route path="/signin" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-
         <Route path="/about/vision-mission" element={<VisionPage />} />
         <Route path="/about/overview" element={<OverviewPage />} />
         <Route path="/about/history" element={<HistoryPage />} />
@@ -47,13 +67,33 @@ function App() {
         <Route path="/publications" element={<PublicationsPage />} />
         <Route path="/contact" element={<ContactPage />} />
 
-
         
-        <Route path="/dashboard" element={<DashboardLayout />}>
+        <Route path="/dashboard" element={<ProtectedDashboard />}>
           <Route index element={<DashboardHome />} />
-          <Route path="doctors" element={<DoctorPage />} />
-          <Route path="clinics" element={<ClinicPage />} />
-          <Route path="patients" element={<PatientPage />} />
+          <Route
+            path="doctors"
+            element={
+              <RoleRoute allowedRoles={[ROLE.ADMIN]}>
+                <DoctorPage />
+              </RoleRoute>
+            }
+          />
+          <Route
+            path="clinics"
+            element={
+              <RoleRoute allowedRoles={[ROLE.ADMIN, ROLE.DOCTOR]}>
+                <ClinicPage />
+              </RoleRoute>
+            }
+          />
+          <Route
+            path="patients"
+            element={
+              <RoleRoute allowedRoles={[ROLE.ADMIN, ROLE.DOCTOR]}>
+                <PatientPage />
+              </RoleRoute>
+            }
+          />
         </Route>
 
       </Routes>

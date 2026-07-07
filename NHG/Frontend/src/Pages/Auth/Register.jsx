@@ -1,10 +1,9 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Plus, ArrowRight } from 'lucide-react';
 import { registerUser } from '../../Services/authService';
 
-export default function Register() {
-  // 1. Updated state to handle all required payload fields
+export default function Register({ onClose, onSwitchToLogin }) {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -22,7 +21,6 @@ export default function Register() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  // Helper to update form fields dynamically
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -36,7 +34,6 @@ export default function Register() {
     setSuccess('');
     setLoading(true);
 
-    // 2. Validate all fields are filled
     const { firstName, lastName, nic, dob, mobile, address, email, password, confirmPassword } = formData;
     if (!firstName || !lastName || !nic || !dob || !mobile || !address || !email || !password || !confirmPassword) {
       setError('Please fill in all fields');
@@ -57,12 +54,10 @@ export default function Register() {
     }
 
     try {
-      // 3. Pass the entire payload object to your service layer
       const data = await registerUser(formData);
-      
       setSuccess('Registration successful! Redirecting to login...');
       setTimeout(() => {
-        navigate('/signin');
+        navigate('/');
       }, 2000);
     } catch (err) {
       const errorMessage = err.message || 'Registration failed';
@@ -78,53 +73,58 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-100 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 w-full max-w-lg"> {/* Changed max-w-md to max-w-lg for space */}
-        {/* Logo */}
-        <div className="flex justify-center mb-4">
-          <div className="w-12 h-12 rounded-full bg-[#16243e] flex items-center justify-center">
-            <Plus className="w-6 h-6 text-white" strokeWidth={2.5} />
-          </div>
+    /* Removed the outer full-page div wrapper. 
+      The main card is now the root component. Added 'max-h-full' and 'overflow-hidden' 
+      to make sure this component fits comfortably inside whatever modal or grid container you place it in.
+    */
+    <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8 w-full max-w-lg h-full max-h-[90vh] flex flex-col overflow-hidden">
+      
+      {/* Header Section (Kept static so users always know where they are) */}
+      <div className="flex justify-center mb-4 flex-shrink-0">
+        <div className="w-12 h-12 rounded-full bg-[#16243e] flex items-center justify-center">
+          <Plus className="w-6 h-6 text-white" strokeWidth={2.5} />
         </div>
+      </div>
 
-        {/* Heading */}
-        <h1 className="text-center font-serif text-2xl text-[#16243e] mb-1">
-          Create an account
-        </h1>
-        <p className="text-center text-sm text-slate-500 mb-6">
-          Join the NHG Patient Portal to manage your care
-        </p>
+      <h1 className="text-center font-serif text-2xl text-[#16243e] mb-1 flex-shrink-0">
+        Create an account
+      </h1>
+      <p className="text-center text-sm text-slate-500 mb-4 flex-shrink-0">
+        Join the NHG Patient Portal to manage your care
+      </p>
 
-        {/* Tabs */}
-        <div className="flex bg-slate-100 rounded-lg p-1 mb-6">
-          <button
-            type="button"
-            className="flex-1 text-center text-sm font-semibold text-[#16243e] bg-white py-2 rounded-md shadow-sm"
-          >
-            Create account
-          </button>
-          <Link
-            to="/signin"
-            className="flex-1 text-center text-sm font-medium text-slate-500 py-2 rounded-md hover:text-slate-700 transition-colors"
-          >
-            Sign in
-          </Link>
-        </div>
+      {/* Tabs */}
+      <div className="flex bg-slate-100 rounded-lg p-1 mb-4 flex-shrink-0">
+        <button
+          type="button"
+          className="flex-1 text-center text-sm font-semibold text-[#16243e] bg-white py-2 rounded-md shadow-sm"
+        >
+          Create account
+        </button>
+        <button
+          type="button"
+          onClick={onSwitchToLogin}
+          className="flex-1 text-center text-sm font-medium text-slate-500 py-2 rounded-md hover:text-slate-700 transition-colors"
+        >
+          Sign in
+        </button>
+      </div>
 
+      {/* Scrollable Form Body (All scrolling is fully restricted inside here) */}
+      <div className="flex-1 overflow-y-auto pr-1 space-y-4 custom-scrollbar">
         {error && (
-          <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-600 rounded text-sm">
+          <div className="p-3 bg-red-50 border border-red-200 text-red-600 rounded text-sm">
             {error}
           </div>
         )}
 
         {success && (
-          <div className="mb-4 p-3 bg-green-50 border border-green-200 text-green-600 rounded text-sm">
+          <div className="p-3 bg-green-50 border border-green-200 text-green-600 rounded text-sm">
             {success}
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          
           {/* First & Last Name row */}
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -261,7 +261,7 @@ export default function Register() {
         </form>
 
         {/* Divider */}
-        <div className="flex items-center gap-3 my-6">
+        <div className="flex items-center gap-3 my-4">
           <div className="flex-1 h-px bg-slate-200" />
           <span className="text-xs text-slate-400">or</span>
           <div className="flex-1 h-px bg-slate-200" />
@@ -277,7 +277,7 @@ export default function Register() {
         </button>
 
         {/* Security notice */}
-        <div className="mt-6 p-4 bg-[#f6f1e7] rounded-lg">
+        <div className="p-4 bg-[#f6f1e7] rounded-lg">
           <p className="text-sm font-semibold text-[#16243e] mb-1">Privacy & Security</p>
           <p className="text-xs text-slate-500 leading-relaxed">
             Your data is protected under medical privacy laws. By registering, you agree to 
@@ -286,16 +286,18 @@ export default function Register() {
         </div>
 
         {/* Footer link */}
-        <p className="mt-6 text-center text-sm text-slate-500">
+        <p className="text-center text-sm text-slate-500 pt-2">
           Already registered?{' '}
-          <Link
-            to="/signin"
+          <button
+            type="button"
+            onClick={onSwitchToLogin}
             className="text-[#1f6b50] font-medium hover:underline inline-flex items-center gap-1"
           >
             Sign in to your account <ArrowRight className="w-3.5 h-3.5" />
-          </Link>
+          </button>
         </p>
       </div>
+
     </div>
   );
 }
