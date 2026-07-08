@@ -8,6 +8,7 @@ import PatientLabPortal from "../../Components/Lab/PatientLabPortal";
 import {
   asArray,
   buildLabPayload,
+  buildLabUserPayload,
   EMPTY_LAB_FORM,
   getLabId,
   validateLabForm,
@@ -18,6 +19,7 @@ import {
   getAllLabs,
   updateLab,
 } from "../../Services/labService";
+import { registerLabUser } from "../../Services/authService";
 import { getAuthData, ROLE } from "../../Utils/auth";
 
 export default function LabPage() {
@@ -87,6 +89,15 @@ export default function LabPage() {
       turnaroundTime: lab.turnaroundTime || "",
       status: lab.status || "ACTIVE",
       description: lab.description || "",
+      firstName: "",
+      lastName: "",
+      nic: "",
+      dob: "",
+      mobile: "",
+      address: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
     });
     setSelected(lab);
     setErrors({});
@@ -116,7 +127,7 @@ export default function LabPage() {
   };
 
   const saveLab = async (mode) => {
-    const nextErrors = validateLabForm(form);
+    const nextErrors = validateLabForm(form, mode);
     if (Object.keys(nextErrors).length) {
       setErrors(nextErrors);
       return;
@@ -125,6 +136,7 @@ export default function LabPage() {
     try {
       setApiError("");
       if (mode === "create") {
+        await registerLabUser(buildLabUserPayload(form));
         await createLab(buildLabPayload(form));
       } else {
         await updateLab(getLabId(selected), buildLabPayload(form));

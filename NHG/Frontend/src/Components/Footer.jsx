@@ -27,7 +27,6 @@ const cols = [
   {
     title: "Patients",
     links: [
-      { label: "Book Appointment", to: "/book-appointment", isSpecial: true },
       { label: "Find a Doctor",    to: "/doctors" },
       { label: "Patient Rights",   to: "/patient-rights" },
       { label: "Patient Portal",   to: "/portal" },

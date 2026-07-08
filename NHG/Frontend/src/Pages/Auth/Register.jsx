@@ -104,49 +104,7 @@ export default function Register({ onClose, onSwitchToLogin, onRegistrationSucce
           ? 'Register lab staff access for NHG laboratory workflows'
           : 'Join the NHG Patient Portal to manage your care'}
       </p>
-
-      {/* Tabs */}
-      <div className="flex bg-slate-100 rounded-lg p-1 mb-4 flex-shrink-0">
-        <button
-          type="button"
-          className="flex-1 text-center text-sm font-semibold text-[#16243e] bg-white py-2 rounded-md shadow-sm"
-        >
-          Create account
-        </button>
-        <button
-          type="button"
-          onClick={onSwitchToLogin}
-          className="flex-1 text-center text-sm font-medium text-slate-500 py-2 rounded-md hover:text-slate-700 transition-colors"
-        >
-          Sign in
-        </button>
-      </div>
-
-      <div className="grid grid-cols-2 gap-2 rounded-lg bg-slate-100 p-1 mb-4 flex-shrink-0">
-        <button
-          type="button"
-          onClick={() => setAccountType('patient')}
-          className={`rounded-md py-2 text-sm font-semibold transition ${
-            accountType === 'patient'
-              ? 'bg-white text-[#16243e] shadow-sm'
-              : 'text-slate-500 hover:text-slate-700'
-          }`}
-        >
-          Patient
-        </button>
-        <button
-          type="button"
-          onClick={() => setAccountType('lab')}
-          className={`rounded-md py-2 text-sm font-semibold transition ${
-            accountType === 'lab'
-              ? 'bg-white text-[#16243e] shadow-sm'
-              : 'text-slate-500 hover:text-slate-700'
-          }`}
-        >
-          Lab Staff
-        </button>
-      </div>
-
+      
       {/* Scrollable Form Body (All scrolling is fully restricted inside here) */}
       <div className="flex-1 overflow-y-auto pr-1 space-y-4 custom-scrollbar">
         {error && (
