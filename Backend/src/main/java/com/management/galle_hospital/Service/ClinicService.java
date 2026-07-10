@@ -2,9 +2,11 @@ package com.management.galle_hospital.Service;
 
 import com.management.galle_hospital.Model.Clinic;
 import com.management.galle_hospital.Model.Doctor;
+import com.management.galle_hospital.Model.Role;
 import com.management.galle_hospital.Payload.ClinicRequest;
 import com.management.galle_hospital.Repository.ClinicRepository;
 import com.management.galle_hospital.Repository.DoctorRepository;
+import com.management.galle_hospital.Repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +20,7 @@ import java.util.Map;
 public class ClinicService {
     private final ClinicRepository clinicRepository;
     private final DoctorRepository doctorRepository;
+    private final UserRepository userRepository;
 
     public List<Clinic> getAllClinics() {
         return clinicRepository.findAll();
@@ -33,10 +36,18 @@ public class ClinicService {
         if (isBlank(request.getClinicName())) {
             return error("clinicName is required", HttpStatus.BAD_REQUEST);
         }
+        if (request.getConsultantId() == null) {
+            return error("consultantId is required", HttpStatus.BAD_REQUEST);
+        }
 
         Clinic clinic = new Clinic();
         clinic.setClinicName(request.getClinicName());
         clinic.setDescription(request.getDescription());
+
+        ResponseEntity<?> consultantError = applyConsultant(clinic, request.getConsultantId());
+        if (consultantError != null) {
+            return consultantError;
+        }
 
         ResponseEntity<?> doctorsError = applyDoctors(clinic, request.getDoctorIds());
         if (doctorsError != null) {
@@ -51,6 +62,13 @@ public class ClinicService {
                 .<ResponseEntity<?>>map(clinic -> {
                     if (request.getClinicName() != null) clinic.setClinicName(request.getClinicName());
                     if (request.getDescription() != null) clinic.setDescription(request.getDescription());
+
+                    if (request.getConsultantId() != null) {
+                        ResponseEntity<?> consultantError = applyConsultant(clinic, request.getConsultantId());
+                        if (consultantError != null) {
+                            return consultantError;
+                        }
+                    }
 
                     ResponseEntity<?> doctorsError = applyDoctors(clinic, request.getDoctorIds());
                     if (doctorsError != null) {
@@ -82,6 +100,18 @@ public class ClinicService {
 
         clinic.setDoctors(doctors);
         return null;
+    }
+
+    private ResponseEntity<?> applyConsultant(Clinic clinic, Long consultantId) {
+        return userRepository.findById(consultantId)
+                .<ResponseEntity<?>>map(consultant -> {
+                    if (consultant.getRole() != Role.CONSULTANT) {
+                        return error("consultantId must belong to a CONSULTANT user", HttpStatus.BAD_REQUEST);
+                    }
+                    clinic.setConsultant(consultant);
+                    return null;
+                })
+                .orElseGet(() -> error("Consultant not found", HttpStatus.BAD_REQUEST));
     }
 
     private ResponseEntity<Map<String, String>> error(String message, HttpStatus status) {

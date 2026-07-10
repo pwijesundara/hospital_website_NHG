@@ -1,0 +1,21 @@
+package com.management.galle_hospital.Repository;
+
+import com.management.galle_hospital.Model.AppointmentRequest;
+import com.management.galle_hospital.Model.AppointmentStatus;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+@Repository
+public interface AppointmentRequestRepository extends JpaRepository<AppointmentRequest, Long> {
+    List<AppointmentRequest> findByPatientIdOrderByRequestedAtDesc(Long patientId);
+
+    List<AppointmentRequest> findByClinicSessionClinicConsultantIdOrderByRequestedAtDesc(Long consultantId);
+
+    List<AppointmentRequest> findByClinicSessionClinicConsultantIdAndStatusOrderByRequestedAtDesc(Long consultantId, AppointmentStatus status);
+
+    long countByClinicSessionIdAndStatus(Long clinicSessionId, AppointmentStatus status);
+
+    boolean existsByPatientIdAndClinicSessionIdAndStatus(Long patientId, Long clinicSessionId, AppointmentStatus status);
+}

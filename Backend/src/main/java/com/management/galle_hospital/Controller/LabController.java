@@ -29,6 +29,15 @@ public class LabController {
         return labReportService.submitReport(patientPhoneNumber, description, report);
     }
 
+    @PostMapping("/patients/{patientId}/reports")
+    public ResponseEntity<?> submitReportForPatient(
+            @PathVariable Long patientId,
+            @RequestParam String description,
+            @RequestParam("report") MultipartFile report
+    ) {
+        return labReportService.submitReportForPatient(patientId, description, report);
+    }
+
     @GetMapping("/patients/{phoneNumber}/reports")
     public List<LabReportResponse> getReportsByPatientPhoneNumber(@PathVariable String phoneNumber) {
         return labReportService.getReportsByPatientPhoneNumber(phoneNumber);

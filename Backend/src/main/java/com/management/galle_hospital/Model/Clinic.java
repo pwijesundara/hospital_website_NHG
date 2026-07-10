@@ -20,6 +20,10 @@ public class Clinic {
 
     private String description;
 
+    @ManyToOne
+    @JoinColumn(name = "consultant_id", nullable = false)
+    private User consultant;
+
     @ManyToMany
     @JoinTable(
             name = "clinic_doctors",

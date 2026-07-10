@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -52,6 +53,11 @@ public class PatientController {
     @GetMapping("/{id}/lab-reports")
     public ResponseEntity<?> getLabReports(@PathVariable Long id) {
         return labReportService.getReportsByPatientId(id);
+    }
+
+    @GetMapping("/me/lab-reports")
+    public ResponseEntity<?> getMyLabReports(@RequestParam Long patientId) {
+        return labReportService.getReportsByPatientId(patientId);
     }
 
     @GetMapping("/lab-reports/{reportId}/pdf")

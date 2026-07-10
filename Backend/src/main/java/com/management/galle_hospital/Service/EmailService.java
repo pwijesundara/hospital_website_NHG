@@ -53,4 +53,39 @@ public class EmailService {
             logger.error("Failed to send password reset email to {}", toEmail, exception);
         }
     }
+
+    public void sendAppointmentAcceptedEmail(String toEmail, String patientName, String clinicName, String clinicDate,
+                                             String startTime, String endTime, String location, Long appointmentId) {
+        JavaMailSender mailSender = mailSenderProvider.getIfAvailable();
+        if (mailSender == null) {
+            logger.warn("Mail sender is not configured. Appointment {} accepted for {}", appointmentId, toEmail);
+            return;
+        }
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        if (!fromEmail.isBlank()) {
+            message.setFrom(fromEmail);
+        }
+        message.setTo(toEmail);
+        message.setSubject("Galle Hospital appointment accepted");
+        message.setText("""
+                Dear %s,
+
+                Your appointment request has been accepted.
+
+                Appointment ID: %s
+                Clinic: %s
+                Date: %s
+                Time: %s - %s
+                Location: %s
+
+                Please arrive on time with any relevant medical documents.
+                """.formatted(patientName, appointmentId, clinicName, clinicDate, startTime, endTime, location));
+
+        try {
+            mailSender.send(message);
+        } catch (MailException exception) {
+            logger.error("Failed to send appointment accepted email to {}", toEmail, exception);
+        }
+    }
 }

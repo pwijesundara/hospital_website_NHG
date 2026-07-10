@@ -5,9 +5,11 @@ import com.management.galle_hospital.Model.Patient;
 import com.management.galle_hospital.Model.PasswordResetToken;
 import com.management.galle_hospital.Model.Role;
 import com.management.galle_hospital.Model.User;
+import com.management.galle_hospital.Payload.ConsultantRegistrationRequest;
 import com.management.galle_hospital.Payload.DoctorRegistrationRequest;
 import com.management.galle_hospital.Payload.ForgotPasswordRequest;
 import com.management.galle_hospital.Payload.LabRegistrationRequest;
+import com.management.galle_hospital.Payload.NurseRegistrationRequest;
 import com.management.galle_hospital.Payload.PatientRegistrationRequest;
 import com.management.galle_hospital.Payload.ResetPasswordRequest;
 import com.management.galle_hospital.Payload.UserLoginRequest;
@@ -112,20 +114,40 @@ public class UserService {
             return error(validationError, HttpStatus.BAD_REQUEST);
         }
 
-        User lab = new User();
-        lab.setFirstName(request.getFirstName());
-        lab.setLastName(request.getLastName());
-        lab.setNic(request.getNic());
-        lab.setDob(request.getDob());
-        lab.setMobile(request.getMobile());
-        lab.setAddress(request.getAddress());
-        lab.setEmail(request.getEmail());
-        lab.setPassword(passwordEncoder.encode(request.getPassword()));
-        lab.setRole(Role.LAB);
+        User lab = buildStaffUser(request.getFirstName(), request.getLastName(), request.getNic(), request.getDob(),
+                request.getMobile(), request.getAddress(), request.getEmail(), request.getPassword(), Role.LAB);
 
         User savedLab = userRepository.save(lab);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(Map.of("message", "Lab registered successfully", "id", savedLab.getId().toString()));
+    }
+
+    public ResponseEntity<Map<String, String>> registerConsultant(ConsultantRegistrationRequest request) {
+        String validationError = validateRegistration(request.getEmail(), request.getPassword(), request.getConfirmPassword(), request.getMobile());
+        if (validationError != null) {
+            return error(validationError, HttpStatus.BAD_REQUEST);
+        }
+
+        User consultant = buildStaffUser(request.getFirstName(), request.getLastName(), request.getNic(), request.getDob(),
+                request.getMobile(), request.getAddress(), request.getEmail(), request.getPassword(), Role.CONSULTANT);
+
+        User savedConsultant = userRepository.save(consultant);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(Map.of("message", "Consultant registered successfully", "id", savedConsultant.getId().toString()));
+    }
+
+    public ResponseEntity<Map<String, String>> registerNurse(NurseRegistrationRequest request) {
+        String validationError = validateRegistration(request.getEmail(), request.getPassword(), request.getConfirmPassword(), request.getMobile());
+        if (validationError != null) {
+            return error(validationError, HttpStatus.BAD_REQUEST);
+        }
+
+        User nurse = buildStaffUser(request.getFirstName(), request.getLastName(), request.getNic(), request.getDob(),
+                request.getMobile(), request.getAddress(), request.getEmail(), request.getPassword(), Role.NURSE);
+
+        User savedNurse = userRepository.save(nurse);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(Map.of("message", "Nurse registered successfully", "id", savedNurse.getId().toString()));
     }
 
     public ResponseEntity<Map<String, String>> login(UserLoginRequest request) {
@@ -209,6 +231,21 @@ public class UserService {
 
     private ResponseEntity<Map<String, String>> error(String message, HttpStatus status) {
         return ResponseEntity.status(status).body(Map.of("message", message));
+    }
+
+    private User buildStaffUser(String firstName, String lastName, String nic, java.time.LocalDate dob, String mobile,
+                                String address, String email, String password, Role role) {
+        User user = new User();
+        user.setFirstName(firstName);
+        user.setLastName(lastName);
+        user.setNic(nic);
+        user.setDob(dob);
+        user.setMobile(mobile);
+        user.setAddress(address);
+        user.setEmail(email);
+        user.setPassword(passwordEncoder.encode(password));
+        user.setRole(role);
+        return user;
     }
 
     private boolean isBlank(String value) {

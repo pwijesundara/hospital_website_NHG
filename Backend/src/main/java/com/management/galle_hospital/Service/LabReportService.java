@@ -34,22 +34,37 @@ public class LabReportService {
             return error("Report must be a PDF file", HttpStatus.BAD_REQUEST);
         }
 
+        Patient patient = patientRepository.findByMobile(patientPhoneNumber.trim()).orElse(null);
+        if (patient == null) {
+            return error("Patient not found", HttpStatus.NOT_FOUND);
+        }
+
         try {
-            LabReport labReport = new LabReport();
-            labReport.setPatientPhoneNumber(patientPhoneNumber.trim());
-            labReport.setDescription(description.trim());
-            labReport.setFileName(report.getOriginalFilename());
-            labReport.setContentType(MediaType.APPLICATION_PDF_VALUE);
-            labReport.setSubmittedAt(LocalDateTime.now());
-            labReport.setReportPdf(report.getBytes());
-
-            patientRepository.findByMobile(patientPhoneNumber.trim()).ifPresent(labReport::setPatient);
-
-            LabReport savedReport = labReportRepository.save(labReport);
+            LabReport savedReport = labReportRepository.save(buildReport(patient, description, report));
             return ResponseEntity.status(HttpStatus.CREATED).body(new LabReportResponse(savedReport));
         } catch (IOException exception) {
             return error("Could not read report PDF", HttpStatus.BAD_REQUEST);
         }
+    }
+
+    public ResponseEntity<?> submitReportForPatient(Long patientId, String description, MultipartFile report) {
+        if (patientId == null || isBlank(description) || report == null || report.isEmpty()) {
+            return error("Patient id, description and report PDF are required", HttpStatus.BAD_REQUEST);
+        }
+        if (!isPdf(report)) {
+            return error("Report must be a PDF file", HttpStatus.BAD_REQUEST);
+        }
+
+        return patientRepository.findById(patientId)
+                .<ResponseEntity<?>>map(patient -> {
+                    try {
+                        LabReport savedReport = labReportRepository.save(buildReport(patient, description, report));
+                        return ResponseEntity.status(HttpStatus.CREATED).body(new LabReportResponse(savedReport));
+                    } catch (IOException exception) {
+                        return error("Could not read report PDF", HttpStatus.BAD_REQUEST);
+                    }
+                })
+                .orElseGet(() -> error("Patient not found", HttpStatus.NOT_FOUND));
     }
 
     public List<LabReportResponse> getReportsByPatientPhoneNumber(String patientPhoneNumber) {
@@ -61,7 +76,10 @@ public class LabReportService {
 
     public ResponseEntity<?> getReportsByPatientId(Long patientId) {
         return patientRepository.findById(patientId)
-                .<ResponseEntity<?>>map(patient -> ResponseEntity.ok(getReportsByPatientPhoneNumber(patient.getMobile())))
+                .<ResponseEntity<?>>map(patient -> ResponseEntity.ok(labReportRepository.findByPatientIdOrderBySubmittedAtDesc(patient.getId())
+                        .stream()
+                        .map(LabReportResponse::new)
+                        .toList()))
                 .orElseGet(() -> error("Patient not found", HttpStatus.NOT_FOUND));
     }
 
@@ -78,6 +96,18 @@ public class LabReportService {
                             .body(resource);
                 })
                 .orElseGet(() -> error("Lab report not found", HttpStatus.NOT_FOUND));
+    }
+
+    private LabReport buildReport(Patient patient, String description, MultipartFile report) throws IOException {
+        LabReport labReport = new LabReport();
+        labReport.setPatientPhoneNumber(patient.getMobile());
+        labReport.setDescription(description.trim());
+        labReport.setFileName(report.getOriginalFilename());
+        labReport.setContentType(MediaType.APPLICATION_PDF_VALUE);
+        labReport.setSubmittedAt(LocalDateTime.now());
+        labReport.setReportPdf(report.getBytes());
+        labReport.setPatient(patient);
+        return labReport;
     }
 
     private boolean isPdf(MultipartFile report) {

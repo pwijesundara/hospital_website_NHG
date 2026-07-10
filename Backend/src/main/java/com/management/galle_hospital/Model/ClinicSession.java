@@ -28,6 +28,8 @@ public class ClinicSession {
 
     private String location;
 
+    private String description;
+
     private Integer maximumPatients;
 
 }

@@ -10,9 +10,11 @@ import java.time.LocalTime;
 @Setter
 public class ClinicSessionRequest {
     private Long clinicId;
+    private Long consultantId;
     private LocalDate clinicDate;
     private LocalTime startTime;
     private LocalTime endTime;
     private String location;
+    private String description;
     private Integer maximumPatients;
 }
