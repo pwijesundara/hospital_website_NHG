@@ -2,7 +2,11 @@ import { useState, useEffect } from "react";
 import ClinicQueue from "../Components/Home/ClinicQueue";
 import Navbar from "../Components/Navbar";
 import Footer from "../Components/Footer";  
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import Login from "./Auth/Login";
+import Register from "./Auth/Register";
+import { getAuthData } from "../Utils/auth";
+import { getAllDoctors } from "../Services/doctorService";
 
 // ── Icons (Inline SVG Helpers for strict performance) ──────────────────────
 const Icon = ({ d, size = 16, className = "" }) => (
@@ -38,12 +42,6 @@ const SPECIALTIES = [
   { icon: "🧪", name: "Laboratory & Pathology", desc: "Haematology, biochemistry, microbiology, histopathology with LIMS integration." },
 ];
 
-const DOCTORS = [
-  { initials: "SK", name: "Dr. S. Karunanayake", dept: "Cardiology", quals: "MD, MRCP, DRL, FRCS", slots: "Mon–Fri, 8:00 AM", bgClass: "bg-teal-600" },
-  { initials: "RP", name: "Dr. R. Pathinge", dept: "Pediatrics", quals: "MBChB, DRCPCH, FRCPCH", slots: "Mon–Fri, 10:00 AM", bgClass: "bg-purple-600" },
-  { initials: "NW", name: "Dr. H. Wickramasinghe", dept: "Neurology", quals: "MD, DM Neurology", slots: "Mon–Fri, 10:00 AM", bgClass: "bg-emerald-600" },
-];
-
 const STATS = [
   { num: "1,200+", label: "Hospital Beds" },
   { num: "40+", label: "Medical Specialties" },
@@ -57,6 +55,40 @@ const NEWS = [
   { tag: "Facility Improve", tagColor: "bg-blue-50 text-blue-700 border-blue-100", title: "New 3T MRI Unit Inaugurated at Radiology Department", desc: "State-of-the-art 3T MRI unit offering specialised, improved diagnostic imaging capacity.", date: "April 28, 2026" },
   { tag: "Online", tagColor: "bg-green-50 text-green-700 border-green-100", title: "Online Appointment System Now Live for All OPD Departments", desc: "Patients can now book, reschedule or cancel appointments from the hospital website.", date: "April 22, 2026" },
 ];
+
+const DOCTOR_CARD_COLORS = [
+  "bg-teal-600",
+  "bg-purple-600",
+  "bg-emerald-600",
+  "bg-blue-600",
+  "bg-rose-600",
+  "bg-amber-600",
+];
+
+const toArray = (data) => {
+  if (Array.isArray(data)) return data;
+  if (Array.isArray(data?.doctors)) return data.doctors;
+  if (Array.isArray(data?.data)) return data.data;
+  if (Array.isArray(data?.content)) return data.content;
+  return [];
+};
+
+const getDoctorId = (doctor, index) =>
+  doctor?.id ?? doctor?.doctorId ?? doctor?.userId ?? doctor?.email ?? index;
+
+const getDoctorName = (doctor) =>
+  [doctor?.title, doctor?.firstName, doctor?.lastName].filter(Boolean).join(" ") ||
+  doctor?.name ||
+  doctor?.email ||
+  "Doctor";
+
+const getDoctorInitials = (doctor) => {
+  const parts = [doctor?.firstName, doctor?.lastName].filter(Boolean);
+  if (parts.length) {
+    return parts.map((part) => part.charAt(0)).join("").slice(0, 2).toUpperCase();
+  }
+  return getDoctorName(doctor).split(" ").map((part) => part.charAt(0)).join("").slice(0, 2).toUpperCase();
+};
 
 // ── Shared Layout/Card Components ───────────────────────────────────────────
 function SectionHeader({ subtitle, title, rightContent }) {
@@ -86,8 +118,28 @@ function HealthAlert() {
   );
 }
 
-function HeroSection() {
-  const navigate = useNavigate();
+function AuthModal({ authMode, onClose, onSwitchMode }) {
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-2 backdrop-blur-sm sm:p-4">
+      <div className="max-h-[90vh] overflow-y-auto">
+        {authMode === "register" ? (
+          <Register
+            onClose={onClose}
+            onSwitchToLogin={() => onSwitchMode("login")}
+            onRegistrationSuccess={() => onSwitchMode("login")}
+          />
+        ) : (
+          <Login
+            onClose={onClose}
+            onSwitchToRegister={() => onSwitchMode("register")}
+          />
+        )}
+      </div>
+    </div>
+  );
+}
+
+function HeroSection({ onBookAppointment }) {
   return (
     <section className="py-16 px-4 bg-gradient-to-br from-slate-900 via-teal-950 to-slate-950 border-b border-slate-800">
       <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-12 items-center">
@@ -105,16 +157,18 @@ function HeroSection() {
             National Hospital Galle is the premier tertiary-care institution serving the Southern Province – built with over 1,200 beds, 40+ specialties, automated clinic lines, and multi-language support.
           </p>
           <div className="flex flex-wrap justify-center lg:justify-start gap-3">
-            <button    onClick={() => navigate("/book-appointment")} 
-            className="px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-wider text-slate-950 bg-amber-400 hover:bg-amber-300 active:scale-98 shadow-md shadow-amber-500/10 transition-all">
-             
+            <button
+              type="button"
+              onClick={onBookAppointment}
+              className="px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-wider text-slate-950 bg-amber-400 hover:bg-amber-300 active:scale-98 shadow-md shadow-amber-500/10 transition-all"
+            >
               Book Appointment
             </button>
 
             
-            <button className="px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-wider border border-slate-700 text-white hover:bg-slate-800/50 active:scale-98 transition-all">
+            <Link className="px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-wider border border-slate-700 text-white hover:bg-slate-800/50 active:scale-98 transition-all" to="/doctors">
               Find a Doctor
-            </button>
+            </Link>
             <button className="px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-wider border border-teal-500/30 text-teal-300 bg-teal-500/5 hover:bg-teal-500/10 flex items-center gap-2 active:scale-98 transition-all">
               <BotIcon /> AI Assistant
             </button>
@@ -151,7 +205,7 @@ function HeroSection() {
   );
 }
 
-function QuickNav() {
+function QuickNav({ onBookAppointment }) {
   const items = [
     { icon: "📅", label: "Book Appointment", sub: "Online scheduling" },
     { icon: "👨‍⚕️", label: "Find a Doctor", sub: "Profiles & specialties" },
@@ -163,7 +217,12 @@ function QuickNav() {
     <div className="border-b border-slate-200 bg-white sticky top-0 z-40 shadow-sm overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 flex overflow-x-auto scrollbar-hide divide-x divide-slate-100">
         {items.map((item) => (
-          <button key={item.label} className="flex-1 min-w-[140px] md:min-w-max flex flex-col items-center text-center py-4 px-5 hover:bg-slate-50 transition-all group">
+          <button
+            key={item.label}
+            type="button"
+            onClick={item.label === "Book Appointment" ? onBookAppointment : undefined}
+            className="flex-1 min-w-[140px] md:min-w-max flex flex-col items-center text-center py-4 px-5 hover:bg-slate-50 transition-all group"
+          >
             <span className="text-xl mb-1 group-hover:scale-110 transition-transform">{item.icon}</span>
             <span className="text-xs font-bold text-slate-800 group-hover:text-teal-700 transition-colors whitespace-nowrap">{item.label}</span>
             <span className="text-[10px] text-slate-400 mt-0.5 whitespace-nowrap">{item.sub}</span>
@@ -181,11 +240,6 @@ function ClinicalSpecialties() {
         <SectionHeader 
           subtitle="Departments & Services" 
           title="Clinical Specialties" 
-          rightContent={
-            <a href="#" className="text-xs font-bold text-teal-700 hover:text-teal-800 flex items-center gap-1 group">
-              View all 40+ departments <span className="group-hover:translate-x-1 transition-transform"><ChevronRight /></span>
-            </a>
-          }
         />
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {SPECIALTIES.map((s) => (
@@ -193,9 +247,6 @@ function ClinicalSpecialties() {
               <div className="text-3xl mb-4 bg-slate-50 w-12 h-12 flex items-center justify-center rounded-xl border border-slate-100">{s.icon}</div>
               <h3 className="font-bold text-slate-800 mb-2 group-hover:text-teal-700 transition-colors">{s.name}</h3>
               <p className="text-xs text-slate-500 mb-5 leading-relaxed">{s.desc}</p>
-              <a href="#" className="text-xs font-bold text-slate-600 hover:text-teal-700 flex items-center gap-1">
-                View Department Details <ChevronRight />
-              </a>
             </div>
           ))}
         </div>
@@ -295,11 +346,36 @@ function BookingSection() {
 
 function SpecialistConsultants() {
   const [activeTab, setActiveTab] = useState("All");
-  const categories = ["All", "Cardiology", "Pediatrics", "Neurology"];
+  const [doctors, setDoctors] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const loadDoctors = async () => {
+      try {
+        setLoading(true);
+        const data = await getAllDoctors();
+        setDoctors(toArray(data));
+        setError("");
+      } catch (err) {
+        setError(err.message || "Failed to load doctors.");
+        setDoctors([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadDoctors();
+  }, []);
+
+  const categories = [
+    "All",
+    ...Array.from(new Set(doctors.map((doctor) => doctor.department).filter(Boolean))),
+  ];
   
   const filteredDocs = activeTab === "All" 
-    ? DOCTORS 
-    : DOCTORS.filter(d => d.dept === activeTab);
+    ? doctors 
+    : doctors.filter(d => d.department === activeTab);
 
   return (
     <section className="py-16 px-4 bg-slate-50">
@@ -319,22 +395,48 @@ function SpecialistConsultants() {
         />
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {filteredDocs.map((d) => (
-            <div key={d.name} className="bg-white border border-slate-200/70 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
+          {loading && (
+            <div className="md:col-span-3 rounded-2xl border border-slate-200 bg-white p-8 text-center text-sm text-slate-500">
+              Loading doctors from the API...
+            </div>
+          )}
+
+          {!loading && error && (
+            <div className="md:col-span-3 rounded-2xl border border-red-200 bg-red-50 p-8 text-center text-sm text-red-600">
+              {error}
+            </div>
+          )}
+
+          {!loading && !error && filteredDocs.length === 0 && (
+            <div className="md:col-span-3 rounded-2xl border border-slate-200 bg-white p-8 text-center text-sm text-slate-500">
+              No doctors available yet.
+            </div>
+          )}
+
+          {!loading && !error && filteredDocs.map((d, index) => (
+            <div key={getDoctorId(d, index)} className="bg-white border border-slate-200/70 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
               <div>
                 <div className="flex items-center gap-4 mb-4">
-                  <div className={`w-12 h-12 rounded-full flex items-center justify-center text-white font-black text-sm shadow-inner ${d.bgClass}`}>
-                    {d.initials}
+                  <div className={`w-12 h-12 rounded-full flex items-center justify-center overflow-hidden text-white font-black text-sm shadow-inner ${DOCTOR_CARD_COLORS[index % DOCTOR_CARD_COLORS.length]}`}>
+                    {d.profilePhoto ? (
+                      <img src={d.profilePhoto} alt={getDoctorName(d)} className="h-full w-full object-cover" />
+                    ) : (
+                      getDoctorInitials(d)
+                    )}
                   </div>
                   <div>
-                    <h4 className="font-bold text-slate-900 text-sm leading-tight">{d.name}</h4>
-                    <span className="inline-block px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-600 border border-slate-200/40 mt-1">{d.dept}</span>
+                    <h4 className="font-bold text-slate-900 text-sm leading-tight">{getDoctorName(d)}</h4>
+                    <span className="inline-block px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-600 border border-slate-200/40 mt-1">
+                      {d.department || "General Medicine"}
+                    </span>
                   </div>
                 </div>
-                <p className="text-xs text-slate-400 font-medium tracking-wide mb-3">{d.quals}</p>
+                <p className="text-xs text-slate-400 font-medium tracking-wide mb-3">
+                  {d.qualification || "Qualification not provided"}
+                </p>
                 <div className="text-xs text-slate-500 font-medium flex items-center gap-1.5 mb-6 bg-slate-50 p-2 rounded-lg border border-slate-100">
                   <span className="text-slate-400"><ClockIcon /></span>
-                  <span>{d.slots}</span>
+                  <span>{d.specialization || "Specialist consultant"}</span>
                 </div>
               </div>
               <button className="w-full py-2 rounded-xl text-xs font-bold border border-teal-800 text-teal-800 hover:bg-teal-50 transition-all">
@@ -564,16 +666,48 @@ function ContactSection() {
 
 // ── Main Page Export Layout Controller ──────────────────────────────────────
 export default function NationalHospitalGalle() {
+  const navigate = useNavigate();
+  const [loginOpen, setLoginOpen] = useState(false);
+  const [authMode, setAuthMode] = useState("login");
+  const [authData, setAuthData] = useState(getAuthData);
+
+  const openLoginModal = () => {
+    setAuthMode("login");
+    setLoginOpen(true);
+  };
+
+  const handleBookAppointment = () => {
+    const currentAuthData = getAuthData();
+    setAuthData(currentAuthData);
+
+    if (currentAuthData) {
+      navigate("/book-appointment");
+      return;
+    }
+
+    openLoginModal();
+  };
+
   useEffect(() => {
     // Scroll management layout initialization logic safely hooks here if needed.
+  }, []);
+
+  useEffect(() => {
+    const syncAuth = () => setAuthData(getAuthData());
+    window.addEventListener("storage", syncAuth);
+    window.addEventListener("authDataChanged", syncAuth);
+    return () => {
+      window.removeEventListener("storage", syncAuth);
+      window.removeEventListener("authDataChanged", syncAuth);
+    };
   }, []);
 
   return (
     <div className="font-sans bg-slate-50 text-slate-900 min-h-screen antialiased selection:bg-teal-700 selection:text-white">
       <Navbar />
       <HealthAlert />
-      <HeroSection />
-      <QuickNav />
+      <HeroSection onBookAppointment={handleBookAppointment} />
+      <QuickNav onBookAppointment={handleBookAppointment} />
       
       {/* Real-time sync list component provided in module components directory */}
       <div className="bg-white border-b border-slate-100 py-4 shadow-sm">
@@ -589,6 +723,13 @@ export default function NationalHospitalGalle() {
       <DonateSection />
       <ContactSection />
       <Footer />
+      {loginOpen && !authData && (
+        <AuthModal
+          authMode={authMode}
+          onClose={() => setLoginOpen(false)}
+          onSwitchMode={setAuthMode}
+        />
+      )}
     </div>
   );
 }

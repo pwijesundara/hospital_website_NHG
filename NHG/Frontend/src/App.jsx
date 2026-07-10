@@ -84,7 +84,7 @@ function App() {
           <Route
             path="clinics"
             element={
-              <RoleRoute allowedRoles={[ROLE.ADMIN, ROLE.DOCTOR]}>
+              <RoleRoute allowedRoles={[ROLE.ADMIN, ROLE.CONSULTANT, ROLE.DOCTOR, ROLE.PATIENT]}>
                 <ClinicPage />
               </RoleRoute>
             }
@@ -100,7 +100,7 @@ function App() {
           <Route
             path="labs"
             element={
-              <RoleRoute allowedRoles={[ROLE.ADMIN, ROLE.PATIENT]}>
+              <RoleRoute allowedRoles={[ROLE.ADMIN, ROLE.LAB, ROLE.PATIENT]}>
                 <LabPage />
               </RoleRoute>
             }

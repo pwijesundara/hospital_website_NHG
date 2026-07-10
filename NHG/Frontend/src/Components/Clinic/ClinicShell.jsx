@@ -7,7 +7,8 @@ export default function ClinicShell({
   setActiveTab,
   search,
   setSearch,
-  canManage,
+  canAddClinic,
+  canAddSession,
   onAddClinic,
   onAddSession,
   children,
@@ -26,20 +27,24 @@ export default function ClinicShell({
             </div>
           </div>
 
-          {canManage && (
+          {(canAddClinic || canAddSession) && (
             <div className="flex flex-wrap gap-2">
-              <button
-                onClick={onAddClinic}
-                className="inline-flex items-center gap-2 rounded-lg bg-emerald-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-emerald-600"
-              >
-                <Plus size={15} /> Add Clinic
-              </button>
-              <button
-                onClick={onAddSession}
-                className="inline-flex items-center gap-2 rounded-lg bg-slate-800 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-700"
-              >
-                <CalendarDays size={15} /> Add Session
-              </button>
+              {canAddClinic && (
+                <button
+                  onClick={onAddClinic}
+                  className="inline-flex items-center gap-2 rounded-lg bg-emerald-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-emerald-600"
+                >
+                  <Plus size={15} /> Add Clinic
+                </button>
+              )}
+              {canAddSession && (
+                <button
+                  onClick={onAddSession}
+                  className="inline-flex items-center gap-2 rounded-lg bg-slate-800 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-700"
+                >
+                  <CalendarDays size={15} /> Add Session
+                </button>
+              )}
             </div>
           )}
         </div>
@@ -78,4 +83,3 @@ export default function ClinicShell({
     </div>
   );
 }
-

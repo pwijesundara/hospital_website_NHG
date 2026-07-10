@@ -11,6 +11,7 @@ import {
   asArray,
   getClinicDoctorIds,
   getEntityId,
+  getSessionClinicId,
   isClinicAssignedToDoctor,
   normalizeTime,
   toApiTime,
@@ -30,7 +31,12 @@ import { getAuthData, ROLE } from "../../Utils/auth";
 
 export default function ClinicPage() {
   const authData = getAuthData();
-  const canManage = authData?.role === ROLE.ADMIN;
+  const canManageClinics = authData?.role === ROLE.ADMIN;
+  const canManageSessions = authData?.role === ROLE.CONSULTANT;
+  const canViewAllClinics =
+    canManageClinics ||
+    authData?.role === ROLE.CONSULTANT ||
+    authData?.role === ROLE.PATIENT;
   const [activeTab, setActiveTab] = useState("clinics");
   const [clinics, setClinics] = useState([]);
   const [sessions, setSessions] = useState([]);
@@ -70,9 +76,9 @@ export default function ClinicPage() {
   }, [fetchData]);
 
   const visibleClinics = useMemo(() => {
-    if (canManage) return clinics;
+    if (canViewAllClinics) return clinics;
     return clinics.filter((clinic) => isClinicAssignedToDoctor(clinic, authData));
-  }, [authData, canManage, clinics]);
+  }, [authData, canViewAllClinics, clinics]);
 
   const clinicById = useMemo(() => {
     return visibleClinics.reduce((map, clinic) => {
@@ -87,9 +93,9 @@ export default function ClinicPage() {
   );
 
   const visibleSessions = useMemo(() => {
-    if (canManage) return sessions;
-    return sessions.filter((session) => visibleClinicIds.has(String(session.clinicId ?? getEntityId(session.clinic))));
-  }, [canManage, sessions, visibleClinicIds]);
+    if (canViewAllClinics) return sessions;
+    return sessions.filter((session) => visibleClinicIds.has(String(getSessionClinicId(session))));
+  }, [canViewAllClinics, sessions, visibleClinicIds]);
 
   const filteredClinics = visibleClinics.filter((clinic) => {
     const query = search.toLowerCase();
@@ -101,7 +107,11 @@ export default function ClinicPage() {
 
   const filteredSessions = visibleSessions.filter((session) => {
     const query = search.toLowerCase();
-    const clinicName = clinicById[String(session.clinicId)]?.clinicName || session.clinicName || "";
+    const clinicName =
+      clinicById[String(getSessionClinicId(session))]?.clinicName ||
+      session.clinic?.clinicName ||
+      session.clinicName ||
+      "";
     return (
       clinicName.toLowerCase().includes(query) ||
       session.location?.toLowerCase().includes(query) ||
@@ -259,9 +269,17 @@ export default function ClinicPage() {
     }
   };
 
-  const title = canManage ? "Clinics" : "My Clinics";
-  const subtitle = canManage
-    ? `${clinics.length} clinics, ${sessions.length} sessions`
+  const title = canManageClinics
+    ? "Clinics"
+    : authData?.role === ROLE.CONSULTANT
+      ? "Clinic Sessions"
+      : authData?.role === ROLE.PATIENT
+        ? "Clinics & Sessions"
+        : "My Clinics";
+  const subtitle = canViewAllClinics
+    ? authData?.role === ROLE.PATIENT
+      ? `${clinics.length} clinics, ${sessions.length} sessions available to watch`
+      : `${clinics.length} clinics, ${sessions.length} sessions`
     : `${visibleClinics.length} assigned clinics, ${visibleSessions.length} sessions`;
 
   return (
@@ -272,7 +290,8 @@ export default function ClinicPage() {
       setActiveTab={setActiveTab}
       search={search}
       setSearch={setSearch}
-      canManage={canManage}
+      canAddClinic={canManageClinics}
+      canAddSession={canManageSessions}
       onAddClinic={openCreateClinic}
       onAddSession={openCreateSession}
     >
@@ -290,7 +309,7 @@ export default function ClinicPage() {
         <ClinicTable
           clinics={filteredClinics}
           doctors={doctors}
-          canManage={canManage}
+          canManage={canManageClinics}
           onEdit={openEditClinic}
           onDelete={openDelete}
         />
@@ -298,13 +317,13 @@ export default function ClinicPage() {
         <ClinicSessionTable
           sessions={filteredSessions}
           clinicById={clinicById}
-          canManage={canManage}
+          canManage={canManageSessions}
           onEdit={openEditSession}
           onDelete={openDelete}
         />
       )}
 
-      {canManage && (modal === "createClinic" || modal === "editClinic") && (
+      {canManageClinics && (modal === "createClinic" || modal === "editClinic") && (
         <ClinicFormModal
           mode={modal === "createClinic" ? "create" : "edit"}
           form={clinicForm}
@@ -317,11 +336,11 @@ export default function ClinicPage() {
         />
       )}
 
-      {canManage && (modal === "createSession" || modal === "editSession") && (
+      {canManageSessions && (modal === "createSession" || modal === "editSession") && (
         <ClinicSessionFormModal
           mode={modal === "createSession" ? "create" : "edit"}
           form={sessionForm}
-          clinics={clinics}
+          clinics={visibleClinics}
           errors={errors}
           onChange={changeSession}
           onClose={closeModal}
@@ -329,7 +348,9 @@ export default function ClinicPage() {
         />
       )}
 
-      {canManage && (modal === "deleteClinic" || modal === "deleteSession") && selected && (
+      {((modal === "deleteClinic" && canManageClinics) ||
+        (modal === "deleteSession" && canManageSessions)) &&
+        selected && (
         <ClinicDeleteModal
           type={modal === "deleteClinic" ? "clinic" : "session"}
           selected={selected}
@@ -340,4 +361,3 @@ export default function ClinicPage() {
     </ClinicShell>
   );
 }
-

@@ -35,3 +35,30 @@ export const deleteLab = async (id) => {
     throw error.response?.data || { message: "Failed to delete lab record" };
   }
 };
+
+export const submitLabReport = async ({ patientPhoneNumber, description, report }) => {
+  try {
+    const formData = new FormData();
+    formData.append("patientPhoneNumber", patientPhoneNumber);
+    formData.append("description", description);
+    formData.append("report", report);
+
+    const response = await apiClient.post("/lab/reports", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { message: "Failed to submit lab report" };
+  }
+};
+
+export const getLabReportsByPatientPhone = async (phoneNumber) => {
+  try {
+    const response = await apiClient.get(`/lab/patients/${phoneNumber}/reports`);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { message: "Failed to fetch lab reports" };
+  }
+};

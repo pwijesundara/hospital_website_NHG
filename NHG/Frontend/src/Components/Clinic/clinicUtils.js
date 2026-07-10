@@ -23,6 +23,9 @@ export const asArray = (data) => {
 export const getEntityId = (item) =>
   item?.id ?? item?.clinicId ?? item?.doctorId ?? item?.sessionId ?? item?.clinicSessionId;
 
+export const getSessionClinicId = (session) =>
+  session?.clinicId ?? getEntityId(session?.clinic);
+
 export const normalizeTime = (value) => (value ? String(value).slice(0, 5) : "");
 
 export const toApiTime = (value) => (value && value.length === 5 ? `${value}:00` : value);

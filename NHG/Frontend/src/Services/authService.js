@@ -21,6 +21,16 @@ export const registerUser = async (patientData) => {
   }
 };
 
+// Register lab user
+export const registerLabUser = async (labData) => {
+  try {
+    const response = await apiClient.post('/auth/lab/register', labData);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { message: 'Lab registration failed' };
+  }
+};
+
 
 // Request password reset token
 export const forgotPassword = async (email) => {

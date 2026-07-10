@@ -1,15 +1,19 @@
 import { Upload } from "lucide-react";
 import LabField from "./LabField";
-import { getLabId } from "./labUtils";
 
 export default function PatientLabUploadForm({
-  activeLabs,
+  canSubmit,
   error,
   form,
+  isPatient,
+  loading,
   onChange,
+  onFileChange,
   onSubmit,
   success,
 }) {
+  if (!canSubmit) return null;
+
   return (
     <form
       onSubmit={onSubmit}
@@ -21,10 +25,12 @@ export default function PatientLabUploadForm({
         </div>
         <div>
           <h2 className="font-semibold text-[#002325]">
-            Upload report details
+            {isPatient ? "Submit my lab report" : "Submit lab report"}
           </h2>
           <p className="text-sm text-slate-500">
-            Choose a test, date, and report file.
+            {isPatient
+              ? "Upload your PDF report using your patient phone number."
+              : "Upload a PDF report for a patient phone number."}
           </p>
         </div>
       </div>
@@ -42,61 +48,47 @@ export default function PatientLabUploadForm({
       )}
 
       <div className="grid gap-4 md:grid-cols-2">
-        <LabField label="Lab Test">
+        <LabField label="Patient Phone Number">
           <input
-            list="available-lab-tests"
-            value={form.testName}
-            onChange={(event) => onChange("testName", event.target.value)}
+            value={form.patientPhoneNumber}
+            onChange={(event) => onChange("patientPhoneNumber", event.target.value)}
             className="w-full rounded-lg border border-slate-200 px-4 py-2.5 text-sm outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
-            placeholder="Select or type test name"
-          />
-          <datalist id="available-lab-tests">
-            {activeLabs.map((lab) => (
-              <option key={getLabId(lab)} value={lab.testName} />
-            ))}
-          </datalist>
-        </LabField>
-
-        <LabField label="Report Date">
-          <input
-            type="date"
-            value={form.reportDate}
-            onChange={(event) => onChange("reportDate", event.target.value)}
-            className="w-full rounded-lg border border-slate-200 px-4 py-2.5 text-sm outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+            placeholder="0771234567"
           />
         </LabField>
 
-        <LabField label="Report File">
+        <LabField label="PDF Report">
           <input
             type="file"
-            accept=".pdf,.jpg,.jpeg,.png"
-            onChange={(event) =>
-              onChange("fileName", event.target.files?.[0]?.name || "")
-            }
+            accept=".pdf,application/pdf"
+            onChange={(event) => onFileChange(event.target.files?.[0] || null)}
             className="w-full rounded-lg border border-slate-200 px-4 py-2.5 text-sm file:mr-4 file:rounded-md file:border-0 file:bg-emerald-50 file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-emerald-700"
           />
-          {form.fileName && (
+          {form.report && (
             <p className="mt-1 text-xs text-slate-500">
-              Selected: {form.fileName}
+              Selected: {form.report.name}
             </p>
           )}
         </LabField>
 
-        <LabField label="Notes">
-          <textarea
-            value={form.notes}
-            onChange={(event) => onChange("notes", event.target.value)}
-            className="min-h-24 w-full rounded-lg border border-slate-200 px-4 py-2.5 text-sm outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
-            placeholder="Optional notes for your report"
-          />
-        </LabField>
+        <div className="md:col-span-2">
+          <LabField label="Description">
+            <textarea
+              value={form.description}
+              onChange={(event) => onChange("description", event.target.value)}
+              className="min-h-24 w-full rounded-lg border border-slate-200 px-4 py-2.5 text-sm outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+              placeholder="Blood test report"
+            />
+          </LabField>
+        </div>
       </div>
 
       <button
         type="submit"
-        className="mt-5 inline-flex items-center justify-center gap-2 rounded-lg bg-[#1f6b50] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#19553f]"
+        disabled={loading}
+        className="mt-5 inline-flex items-center justify-center gap-2 rounded-lg bg-[#1f6b50] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#19553f] disabled:opacity-60"
       >
-        <Upload size={17} /> Save Lab Info
+        <Upload size={17} /> {loading ? "Submitting..." : "Submit Lab Report"}
       </button>
     </form>
   );

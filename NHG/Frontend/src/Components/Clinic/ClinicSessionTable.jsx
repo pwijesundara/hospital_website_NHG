@@ -1,5 +1,5 @@
 import { CalendarDays, Clock, MapPin, Pencil, Trash2 } from "lucide-react";
-import { getEntityId, normalizeTime } from "./clinicUtils";
+import { getEntityId, getSessionClinicId, normalizeTime } from "./clinicUtils";
 
 export default function ClinicSessionTable({ sessions, clinicById, canManage, onEdit, onDelete }) {
   return (
@@ -22,7 +22,7 @@ export default function ClinicSessionTable({ sessions, clinicById, canManage, on
             </tr>
           ) : (
             sessions.map((session) => {
-              const clinic = clinicById[String(session.clinicId)] || session.clinic;
+              const clinic = clinicById[String(getSessionClinicId(session))] || session.clinic;
               return (
                 <tr key={getEntityId(session)} className="border-t border-slate-100 hover:bg-slate-50">
                   <td className="px-5 py-4">
@@ -60,4 +60,3 @@ export default function ClinicSessionTable({ sessions, clinicById, canManage, on
     </div>
   );
 }
-
