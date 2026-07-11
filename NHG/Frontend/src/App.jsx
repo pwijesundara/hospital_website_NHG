@@ -24,6 +24,7 @@ import ClinicPage from './Pages/Dashboard/ClinicPage';
 import PatientPage from './Pages/Dashboard/PatientPage';
 import LabPage from './Pages/Dashboard/LabPage';
 import StaffAccountsPage from './Pages/Dashboard/StaffAccountsPage';
+import AppointmentRequestsPage from './Pages/Dashboard/AppointmentRequestsPage';
 import { getAuthData, hasRole, ROLE } from './Utils/auth';
 
 function ProtectedDashboard() {
@@ -111,6 +112,14 @@ function App() {
             element={
               <RoleRoute allowedRoles={[ROLE.ADMIN, ROLE.LAB, ROLE.PATIENT]}>
                 <LabPage />
+              </RoleRoute>
+            }
+          />
+          <Route
+            path="appointment-requests"
+            element={
+              <RoleRoute allowedRoles={[ROLE.CONSULTANT, ROLE.PATIENT]}>
+                <AppointmentRequestsPage />
               </RoleRoute>
             }
           />

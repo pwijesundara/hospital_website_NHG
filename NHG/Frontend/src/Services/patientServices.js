@@ -9,6 +9,15 @@ export const getAllPatients = async () => {
   }
 };
 
+export const getPatientById = async (id) => {
+  try {
+    const response = await apiClient.get(`/patients/${id}`);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { message: 'Failed to fetch patient data' };
+  }
+};
+
 export const updatePatient = async (id, payload) => {
   try {
     const response = await apiClient.put(`/patients/${id}`, payload);

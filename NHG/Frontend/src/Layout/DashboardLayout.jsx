@@ -1,5 +1,6 @@
 import {
   Building2,
+  CalendarCheck,
   Home,
   LayoutDashboard,
   LogOut,
@@ -48,6 +49,12 @@ const DASHBOARD_LINKS = [
     to: "/dashboard/labs",
     icon: Microscope,
     roles: [ROLE.ADMIN, ROLE.LAB, ROLE.PATIENT],
+  },
+  {
+    label: "My Requests",
+    to: "/dashboard/appointment-requests",
+    icon: CalendarCheck,
+    roles: [ROLE.CONSULTANT, ROLE.PATIENT],
   },
 ];
 
@@ -101,6 +108,8 @@ function DashboardLayout() {
                   ? "Clinics & Sessions"
                   : role === ROLE.PATIENT && label === "Labs"
                     ? "My Lab Reports"
+                    : role === ROLE.CONSULTANT && label === "My Requests"
+                      ? "Appointment Requests"
                     : label}
             </NavLink>
           ))}

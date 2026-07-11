@@ -1,4 +1,4 @@
-import { CalendarPlus, ClipboardList, Microscope, Stethoscope, UserCog, UserRound, Users } from "lucide-react";
+import { CalendarCheck, CalendarPlus, ClipboardList, Microscope, Stethoscope, UserCog, UserRound, Users } from "lucide-react";
 import { Link } from "react-router-dom";
 import { getAuthData, ROLE } from "../../Utils/auth";
 
@@ -61,6 +61,12 @@ const CONTENT = {
         to: "/dashboard/clinics",
         icon: ClipboardList,
       },
+      {
+        title: "Appointment Requests",
+        description: "Review pending requests assigned to your clinic sessions.",
+        to: "/dashboard/appointment-requests",
+        icon: CalendarCheck,
+      },
     ],
   },
   [ROLE.LAB]: {
@@ -84,6 +90,12 @@ const CONTENT = {
         description: "Request an appointment with hospital services.",
         to: "/book-appointment",
         icon: CalendarPlus,
+      },
+      {
+        title: "My Requests",
+        description: "View submitted appointment request status.",
+        to: "/dashboard/appointment-requests",
+        icon: CalendarCheck,
       },
       {
         title: "My Lab Reports",

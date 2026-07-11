@@ -73,6 +73,16 @@ export default function ClinicSessionFormModal({
             />
           </Field>
         </div>
+        <div className="sm:col-span-2">
+          <Field label="Description">
+            <textarea
+              className={`${inputCls()} min-h-24 resize-none`}
+              value={form.description}
+              onChange={(event) => onChange("description", event.target.value)}
+              placeholder="Morning cardiology clinic session"
+            />
+          </Field>
+        </div>
       </div>
       <div className="flex gap-3 px-5 pb-5">
         <button onClick={onClose} className="flex-1 rounded-lg border border-slate-200 px-4 py-2.5 text-sm text-slate-600">

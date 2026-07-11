@@ -11,6 +11,7 @@ export const EMPTY_SESSION_FORM = {
   startTime: "",
   endTime: "",
   location: "",
+  description: "",
   maximumPatients: "",
 };
 

@@ -166,6 +166,7 @@ export default function ClinicPage() {
       startTime: normalizeTime(session.startTime),
       endTime: normalizeTime(session.endTime),
       location: session.location || "",
+      description: session.description || "",
       maximumPatients: session.maximumPatients ?? "",
     });
     setSelected(session);
@@ -243,14 +244,29 @@ export default function ClinicPage() {
     doctorIds: clinicForm.doctorIds.map(Number),
   });
 
-  const sessionPayload = () => ({
-    clinicId: sessionForm.clinicId ? Number(sessionForm.clinicId) : null,
-    clinicDate: sessionForm.clinicDate || null,
-    startTime: toApiTime(sessionForm.startTime) || null,
-    endTime: toApiTime(sessionForm.endTime) || null,
-    location: sessionForm.location.trim() || null,
-    maximumPatients: sessionForm.maximumPatients ? Number(sessionForm.maximumPatients) : null,
-  });
+  const sessionPayload = () => {
+    const clinicId = sessionForm.clinicId
+      ? Number(sessionForm.clinicId)
+      : Number(getSessionClinicId(selected));
+    const clinic =
+      visibleClinics.find((item) => Number(getEntityId(item)) === clinicId) ||
+      selected?.clinic;
+    const consultantId =
+      getClinicConsultantId(clinic) ??
+      selected?.consultantId ??
+      getEntityId(selected?.consultant);
+
+    return {
+      clinicId,
+      consultantId: consultantId ? Number(consultantId) : null,
+      clinicDate: sessionForm.clinicDate || null,
+      startTime: toApiTime(sessionForm.startTime) || null,
+      endTime: toApiTime(sessionForm.endTime) || null,
+      location: sessionForm.location.trim(),
+      description: sessionForm.description.trim(),
+      maximumPatients: sessionForm.maximumPatients ? Number(sessionForm.maximumPatients) : null,
+    };
+  };
 
   const saveClinic = async (mode) => {
     const nextErrors = validateClinic();

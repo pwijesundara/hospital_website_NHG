@@ -103,15 +103,15 @@ public class ClinicService {
     }
 
     private ResponseEntity<?> applyConsultant(Clinic clinic, Long consultantId) {
-        return userRepository.findById(consultantId)
-                .<ResponseEntity<?>>map(consultant -> {
-                    if (consultant.getRole() != Role.CONSULTANT) {
-                        return error("consultantId must belong to a CONSULTANT user", HttpStatus.BAD_REQUEST);
-                    }
-                    clinic.setConsultant(consultant);
-                    return null;
-                })
-                .orElseGet(() -> error("Consultant not found", HttpStatus.BAD_REQUEST));
+        var consultant = userRepository.findById(consultantId);
+        if (consultant.isEmpty()) {
+            return error("Consultant not found", HttpStatus.BAD_REQUEST);
+        }
+        if (consultant.get().getRole() != Role.CONSULTANT) {
+            return error("consultantId must belong to a CONSULTANT user", HttpStatus.BAD_REQUEST);
+        }
+        clinic.setConsultant(consultant.get());
+        return null;
     }
 
     private ResponseEntity<Map<String, String>> error(String message, HttpStatus status) {
