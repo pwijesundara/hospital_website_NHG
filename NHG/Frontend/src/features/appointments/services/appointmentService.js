@@ -1,0 +1,59 @@
+import apiClient from "../../../shared/api/api";
+
+export const requestAppointment = async (payload) => {
+  try {
+    const response = await apiClient.post("/appointments/requests", payload);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { message: "Failed to request appointment" };
+  }
+};
+
+export const getPatientAppointmentRequests = async (patientId) => {
+  try {
+    const response = await apiClient.get(`/appointments/patients/${patientId}/requests`);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { message: "Failed to fetch appointment requests" };
+  }
+};
+
+export const getConsultantAppointmentRequests = async (consultantId, status = "") => {
+  try {
+    const response = await apiClient.get(
+      `/appointments/consultants/${consultantId}/requests`,
+      {
+        params: status ? { status } : {},
+      }
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { message: "Failed to fetch appointment requests" };
+  }
+};
+
+export const acceptAppointmentRequest = async ({ requestId, consultantId }) => {
+  try {
+    const response = await apiClient.patch(
+      `/appointments/requests/${requestId}/accept`,
+      null,
+      { params: { consultantId } }
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { message: "Failed to accept appointment request" };
+  }
+};
+
+export const removeAppointmentRequest = async ({ requestId, consultantId }) => {
+  try {
+    const response = await apiClient.patch(
+      `/appointments/requests/${requestId}/remove`,
+      null,
+      { params: { consultantId } }
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { message: "Failed to remove appointment request" };
+  }
+};
