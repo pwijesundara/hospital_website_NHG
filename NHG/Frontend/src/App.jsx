@@ -23,6 +23,7 @@ import DoctorPage from './Pages/Dashboard/DoctorPage';
 import ClinicPage from './Pages/Dashboard/ClinicPage';
 import PatientPage from './Pages/Dashboard/PatientPage';
 import LabPage from './Pages/Dashboard/LabPage';
+import StaffAccountsPage from './Pages/Dashboard/StaffAccountsPage';
 import { getAuthData, hasRole, ROLE } from './Utils/auth';
 
 function ProtectedDashboard() {
@@ -84,7 +85,7 @@ function App() {
           <Route
             path="clinics"
             element={
-              <RoleRoute allowedRoles={[ROLE.ADMIN, ROLE.CONSULTANT, ROLE.DOCTOR, ROLE.PATIENT]}>
+              <RoleRoute allowedRoles={[ROLE.CONSULTANT, ROLE.DOCTOR, ROLE.PATIENT]}>
                 <ClinicPage />
               </RoleRoute>
             }
@@ -94,6 +95,14 @@ function App() {
             element={
               <RoleRoute allowedRoles={[ROLE.ADMIN, ROLE.DOCTOR]}>
                 <PatientPage />
+              </RoleRoute>
+            }
+          />
+          <Route
+            path="staff"
+            element={
+              <RoleRoute allowedRoles={[ROLE.ADMIN]}>
+                <StaffAccountsPage />
               </RoleRoute>
             }
           />

@@ -3,6 +3,7 @@ export const ROLE = {
   CONSULTANT: "CONSULTANT",
   DOCTOR: "DOCTOR",
   LAB: "LAB",
+  NURSE: "NURSE",
   PATIENT: "PATIENT",
 };
 

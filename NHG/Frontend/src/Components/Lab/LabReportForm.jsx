@@ -1,38 +1,33 @@
+import { useEffect, useRef } from "react";
 import { Upload } from "lucide-react";
 import LabField from "./LabField";
 
-export default function PatientLabUploadForm({
-  canSubmit,
+export default function LabReportForm({
   error,
   form,
-  isPatient,
   loading,
   onChange,
   onFileChange,
   onSubmit,
   success,
 }) {
-  if (!canSubmit) return null;
+  const fileInputRef = useRef(null);
+
+  useEffect(() => {
+    if (!form.report && fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  }, [form.report]);
 
   return (
     <form
       onSubmit={onSubmit}
-      className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm"
+      className="rounded-xl border border-slate-200 bg-white p-5"
     >
-      <div className="mb-5 flex items-center gap-3">
-        <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-emerald-50 text-emerald-700">
-          <Upload size={20} />
-        </div>
-        <div>
-          <h2 className="font-semibold text-[#002325]">
-            {isPatient ? "Submit my lab report" : "Submit lab report"}
-          </h2>
-          <p className="text-sm text-slate-500">
-            {isPatient
-              ? "Upload your PDF report using your patient phone number."
-              : "Upload a PDF report for a patient phone number."}
-          </p>
-        </div>
+      <div className="mb-4">
+        <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">
+          Upload Report
+        </p>
       </div>
 
       {error && (
@@ -40,9 +35,8 @@ export default function PatientLabUploadForm({
           {error}
         </div>
       )}
-
       {success && (
-        <div className="mb-4 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
+        <div className="mb-4 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
           {success}
         </div>
       )}
@@ -57,19 +51,17 @@ export default function PatientLabUploadForm({
           />
         </LabField>
 
-        <LabField label="PDF Report">
-          <input
-            type="file"
-            accept=".pdf,application/pdf"
-            onChange={(event) => onFileChange(event.target.files?.[0] || null)}
-            className="w-full rounded-lg border border-slate-200 px-4 py-2.5 text-sm file:mr-4 file:rounded-md file:border-0 file:bg-emerald-50 file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-emerald-700"
-          />
-          {form.report && (
-            <p className="mt-1 text-xs text-slate-500">
-              Selected: {form.report.name}
-            </p>
-          )}
-        </LabField>
+        <div className="md:col-span-2">
+          <LabField label="PDF Report">
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="application/pdf,.pdf"
+              onChange={(event) => onFileChange(event.target.files?.[0] || null)}
+              className="w-full rounded-lg border border-dashed border-slate-300 px-4 py-2.5 text-sm file:mr-4 file:rounded-md file:border-0 file:bg-emerald-50 file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-emerald-700"
+            />
+          </LabField>
+        </div>
 
         <div className="md:col-span-2">
           <LabField label="Description">
@@ -88,7 +80,7 @@ export default function PatientLabUploadForm({
         disabled={loading}
         className="mt-5 inline-flex items-center justify-center gap-2 rounded-lg bg-[#1f6b50] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#19553f] disabled:opacity-60"
       >
-        <Upload size={17} /> {loading ? "Submitting..." : "Submit Lab Report"}
+        <Upload size={17} /> {loading ? "Uploading..." : "Create Report"}
       </button>
     </form>
   );

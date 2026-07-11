@@ -9,6 +9,7 @@ import {
   EMPTY_CLINIC_FORM,
   EMPTY_SESSION_FORM,
   asArray,
+  getClinicConsultantId,
   getClinicDoctorIds,
   getEntityId,
   getSessionClinicId,
@@ -17,6 +18,7 @@ import {
   toApiTime,
 } from "../../Components/Clinic/clinicUtils";
 import { getAllDoctors } from "../../Services/doctorService";
+import { getAllConsultants } from "../../Services/staffService";
 import {
   createClinic,
   createClinicSession,
@@ -31,15 +33,15 @@ import { getAuthData, ROLE } from "../../Utils/auth";
 
 export default function ClinicPage() {
   const authData = getAuthData();
-  const canManageClinics = authData?.role === ROLE.ADMIN;
+  const canManageClinics = authData?.role === ROLE.CONSULTANT;
   const canManageSessions = authData?.role === ROLE.CONSULTANT;
   const canViewAllClinics =
     canManageClinics ||
-    authData?.role === ROLE.CONSULTANT ||
     authData?.role === ROLE.PATIENT;
   const [activeTab, setActiveTab] = useState("clinics");
   const [clinics, setClinics] = useState([]);
   const [sessions, setSessions] = useState([]);
+  const [consultants, setConsultants] = useState([]);
   const [doctors, setDoctors] = useState([]);
   const [search, setSearch] = useState("");
   const [modal, setModal] = useState(null);
@@ -53,15 +55,27 @@ export default function ClinicPage() {
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
-      const [clinicData, sessionData, doctorData] = await Promise.all([
+      const [clinicData, sessionData, doctorData, consultantData] = await Promise.all([
         getAllClinics(),
         getAllClinicSessions(),
         getAllDoctors(),
+        getAllConsultants(),
       ]);
 
       setClinics(asArray(clinicData));
       setSessions(asArray(sessionData));
-      setDoctors(asArray(doctorData));
+      setDoctors(
+        asArray(doctorData).filter(
+          (doctor) => doctor?.id != null && (!doctor?.role || doctor.role === ROLE.DOCTOR)
+        )
+      );
+      setConsultants(
+        asArray(consultantData).filter(
+          (consultant) =>
+            consultant?.id != null &&
+            (!consultant?.role || consultant.role === ROLE.CONSULTANT)
+        )
+      );
       setApiError("");
     } catch (error) {
       setApiError(error.message || "Failed to load clinic data.");
@@ -130,6 +144,7 @@ export default function ClinicPage() {
     setClinicForm({
       clinicName: clinic.clinicName || "",
       description: clinic.description || "",
+      consultantId: getClinicConsultantId(clinic) || "",
       doctorIds: getClinicDoctorIds(clinic).map(Number),
     });
     setSelected(clinic);
@@ -191,6 +206,24 @@ export default function ClinicPage() {
   const validateClinic = () => {
     const nextErrors = {};
     if (!clinicForm.clinicName.trim()) nextErrors.clinicName = "Clinic name is required.";
+    if (!clinicForm.description.trim()) nextErrors.description = "Description is required.";
+    if (!clinicForm.consultantId) nextErrors.consultantId = "Consultant is required.";
+    if (clinicForm.consultantId && Number.isNaN(Number(clinicForm.consultantId))) {
+      nextErrors.consultantId = "Select a valid consultant.";
+    }
+    const consultantExists = consultants.some(
+      (consultant) => Number(consultant.id) === Number(clinicForm.consultantId)
+    );
+    if (clinicForm.consultantId && !consultantExists) {
+      nextErrors.consultantId = "Selected consultant was not found.";
+    }
+    if (!clinicForm.doctorIds.length) nextErrors.doctorIds = "Select at least one doctor.";
+    const allDoctorsExist = clinicForm.doctorIds.every((doctorId) =>
+      doctors.some((doctor) => Number(doctor.id) === Number(doctorId))
+    );
+    if (clinicForm.doctorIds.length && !allDoctorsExist) {
+      nextErrors.doctorIds = "One or more selected doctors were not found.";
+    }
     return nextErrors;
   };
 
@@ -205,8 +238,9 @@ export default function ClinicPage() {
 
   const clinicPayload = () => ({
     clinicName: clinicForm.clinicName.trim(),
-    description: clinicForm.description.trim() || null,
-    doctorIds: clinicForm.doctorIds,
+    description: clinicForm.description.trim(),
+    consultantId: Number(clinicForm.consultantId),
+    doctorIds: clinicForm.doctorIds.map(Number),
   });
 
   const sessionPayload = () => ({
@@ -270,7 +304,7 @@ export default function ClinicPage() {
   };
 
   const title = canManageClinics
-    ? "Clinics"
+    ? "Clinic Management"
     : authData?.role === ROLE.CONSULTANT
       ? "Clinic Sessions"
       : authData?.role === ROLE.PATIENT
@@ -282,6 +316,8 @@ export default function ClinicPage() {
       : `${clinics.length} clinics, ${sessions.length} sessions`
     : `${visibleClinics.length} assigned clinics, ${visibleSessions.length} sessions`;
 
+
+    
   return (
     <ClinicShell
       title={title}
@@ -308,6 +344,7 @@ export default function ClinicPage() {
       ) : activeTab === "clinics" ? (
         <ClinicTable
           clinics={filteredClinics}
+          consultants={consultants}
           doctors={doctors}
           canManage={canManageClinics}
           onEdit={openEditClinic}
@@ -327,6 +364,7 @@ export default function ClinicPage() {
         <ClinicFormModal
           mode={modal === "createClinic" ? "create" : "edit"}
           form={clinicForm}
+          consultants={consultants}
           doctors={doctors}
           errors={errors}
           onChange={changeClinic}

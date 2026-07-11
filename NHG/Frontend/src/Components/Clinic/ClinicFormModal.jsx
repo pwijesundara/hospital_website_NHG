@@ -1,9 +1,16 @@
 import ClinicModal, { Field } from "./ClinicModal";
-import { doctorName, getEntityId, inputCls } from "./clinicUtils";
+import {
+  consultantName,
+  doctorName,
+  getConsultantId,
+  getEntityId,
+  inputCls,
+} from "./clinicUtils";
 
 export default function ClinicFormModal({
   mode,
   form,
+  consultants,
   doctors,
   errors,
   onChange,
@@ -22,15 +29,32 @@ export default function ClinicFormModal({
             placeholder="Cardiology Clinic"
           />
         </Field>
-        <Field label="Description">
+        <Field label="Description" error={errors.description}>
           <textarea
-            className={`${inputCls()} min-h-24 resize-none`}
+            className={`${inputCls(errors.description)} min-h-24 resize-none`}
             value={form.description}
             onChange={(event) => onChange("description", event.target.value)}
             placeholder="Heart related consultations"
           />
         </Field>
-        <Field label="Doctors">
+        <Field label="Consultant" error={errors.consultantId}>
+          <select
+            className={inputCls(errors.consultantId)}
+            value={form.consultantId}
+            onChange={(event) => onChange("consultantId", event.target.value)}
+          >
+            <option value="">Select consultant</option>
+            {consultants.map((consultant) => {
+              const consultantId = getConsultantId(consultant);
+              return (
+                <option key={consultantId} value={consultantId}>
+                  {consultantName(consultant)}
+                </option>
+              );
+            })}
+          </select>
+        </Field>
+        <Field label="Doctors" error={errors.doctorIds}>
           <div className="grid max-h-48 gap-2 overflow-y-auto rounded-lg border border-slate-200 p-3 sm:grid-cols-2">
             {doctors.length === 0 ? (
               <p className="text-xs text-slate-400">No doctors available.</p>

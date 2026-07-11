@@ -1,11 +1,11 @@
-import { CalendarPlus, ClipboardList, Microscope, Stethoscope, UserRound, Users } from "lucide-react";
+import { CalendarPlus, ClipboardList, Microscope, Stethoscope, UserCog, UserRound, Users } from "lucide-react";
 import { Link } from "react-router-dom";
 import { getAuthData, ROLE } from "../../Utils/auth";
 
 const CONTENT = {
   [ROLE.ADMIN]: {
     title: "Admin Dashboard",
-    description: "Manage hospital doctors, clinics, and patient records from one place.",
+    description: "Manage hospital doctors, staff, lab accounts, and patient records from one place.",
     cards: [
       {
         title: "Doctors",
@@ -14,16 +14,16 @@ const CONTENT = {
         icon: Stethoscope,
       },
       {
-        title: "Clinics",
-        description: "Maintain clinic details and working schedules.",
-        to: "/dashboard/clinics",
-        icon: ClipboardList,
-      },
-      {
         title: "Patients",
         description: "View and manage registered patient records.",
         to: "/dashboard/patients",
         icon: Users,
+      },
+      {
+        title: "Staff Accounts",
+        description: "Register consultant and nurse staff accounts.",
+        to: "/dashboard/staff",
+        icon: UserCog,
       },
       {
         title: "Labs",
@@ -53,11 +53,11 @@ const CONTENT = {
   },
   [ROLE.CONSULTANT]: {
     title: "Consultant Dashboard",
-    description: "Create and manage clinic sessions for hospital clinics.",
+    description: "Create and manage clinics, doctors assigned to clinics, and clinic sessions.",
     cards: [
       {
-        title: "Clinic Sessions",
-        description: "Add clinic sessions with date, time, location, and patient capacity.",
+        title: "Clinic Management",
+        description: "Create clinics, assign doctors, and manage clinic sessions.",
         to: "/dashboard/clinics",
         icon: ClipboardList,
       },
@@ -86,8 +86,8 @@ const CONTENT = {
         icon: CalendarPlus,
       },
       {
-        title: "Submit Lab Report",
-        description: "Upload your lab report and review submitted diagnostic documents.",
+        title: "My Lab Reports",
+        description: "View lab reports linked to your patient account.",
         to: "/dashboard/labs",
         icon: Microscope,
       },

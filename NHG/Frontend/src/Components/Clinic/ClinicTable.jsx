@@ -1,7 +1,13 @@
 import { Pencil, Stethoscope, Trash2, Users } from "lucide-react";
-import { doctorName, getClinicDoctorIds, getEntityId } from "./clinicUtils";
+import {
+  consultantName,
+  doctorName,
+  getClinicConsultantId,
+  getClinicDoctorIds,
+  getEntityId,
+} from "./clinicUtils";
 
-export default function ClinicTable({ clinics, doctors, canManage, onEdit, onDelete }) {
+export default function ClinicTable({ clinics, consultants, doctors, canManage, onEdit, onDelete }) {
   const doctorLabel = (doctorIds = []) => {
     if (!doctorIds.length) return "No doctors assigned";
 
@@ -14,12 +20,29 @@ export default function ClinicTable({ clinics, doctors, canManage, onEdit, onDel
     );
   };
 
+  const consultantLabel = (clinic) => {
+    if (clinic.consultant) return consultantName(clinic.consultant);
+    const consultantId = getClinicConsultantId(clinic);
+    return (
+      consultants.find(
+        (consultant) => String(getEntityId(consultant)) === String(consultantId)
+      )?.firstName
+        ? consultantName(
+            consultants.find(
+              (consultant) => String(getEntityId(consultant)) === String(consultantId)
+            )
+          )
+        : "No consultant assigned"
+    );
+  };
+
   return (
     <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
       <table className="w-full text-sm">
         <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-400">
           <tr>
             <th className="px-5 py-3 text-left font-medium">Clinic</th>
+            <th className="px-5 py-3 text-left font-medium">Consultant</th>
             <th className="px-5 py-3 text-left font-medium">Doctors</th>
             {canManage && <th className="px-5 py-3 text-right font-medium">Actions</th>}
           </tr>
@@ -27,7 +50,7 @@ export default function ClinicTable({ clinics, doctors, canManage, onEdit, onDel
         <tbody>
           {clinics.length === 0 ? (
             <tr>
-              <td colSpan={canManage ? 3 : 2} className="px-5 py-12 text-center text-slate-400">
+              <td colSpan={canManage ? 4 : 3} className="px-5 py-12 text-center text-slate-400">
                 No clinics found.
               </td>
             </tr>
@@ -46,6 +69,9 @@ export default function ClinicTable({ clinics, doctors, canManage, onEdit, onDel
                       </p>
                     </div>
                   </div>
+                </td>
+                <td className="px-5 py-4 text-xs text-slate-500">
+                  {consultantLabel(clinic)}
                 </td>
                 <td className="px-5 py-4 text-xs text-slate-500">
                   <div className="flex items-center gap-1.5">
@@ -71,4 +97,3 @@ export default function ClinicTable({ clinics, doctors, canManage, onEdit, onDel
     </div>
   );
 }
-

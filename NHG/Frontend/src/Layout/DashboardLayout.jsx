@@ -5,6 +5,7 @@ import {
   LogOut,
   Microscope,
   Stethoscope,
+  UserCog,
   Users,
 } from "lucide-react";
 import { Outlet, NavLink, useNavigate } from "react-router-dom";
@@ -16,7 +17,7 @@ const DASHBOARD_LINKS = [
     to: "/dashboard",
     end: true,
     icon: LayoutDashboard,
-    roles: [ROLE.ADMIN, ROLE.CONSULTANT, ROLE.DOCTOR, ROLE.LAB, ROLE.PATIENT],
+    roles: [ROLE.ADMIN, ROLE.CONSULTANT, ROLE.DOCTOR, ROLE.LAB, ROLE.NURSE, ROLE.PATIENT],
   },
   {
     label: "Doctors",
@@ -28,13 +29,19 @@ const DASHBOARD_LINKS = [
     label: "Clinics",
     to: "/dashboard/clinics",
     icon: Building2,
-    roles: [ROLE.ADMIN, ROLE.CONSULTANT, ROLE.DOCTOR, ROLE.PATIENT],
+    roles: [ROLE.CONSULTANT, ROLE.DOCTOR, ROLE.PATIENT],
   },
   {
     label: "Patients",
     to: "/dashboard/patients",
     icon: Users,
     roles: [ROLE.ADMIN, ROLE.DOCTOR],
+  },
+  {
+    label: "Staff Accounts",
+    to: "/dashboard/staff",
+    icon: UserCog,
+    roles: [ROLE.ADMIN],
   },
   {
     label: "Labs",
@@ -49,6 +56,7 @@ const ROLE_LABELS = {
   [ROLE.CONSULTANT]: "Consultant Workspace",
   [ROLE.DOCTOR]: "Doctor Workspace",
   [ROLE.LAB]: "Lab Workspace",
+  [ROLE.NURSE]: "Nurse Workspace",
   [ROLE.PATIENT]: "Patient Portal",
 };
 
@@ -92,7 +100,7 @@ function DashboardLayout() {
                 : role === ROLE.PATIENT && label === "Clinics"
                   ? "Clinics & Sessions"
                   : role === ROLE.PATIENT && label === "Labs"
-                    ? "Submit Lab Report"
+                    ? "My Lab Reports"
                     : label}
             </NavLink>
           ))}

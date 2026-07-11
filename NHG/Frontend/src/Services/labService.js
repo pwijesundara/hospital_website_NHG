@@ -9,12 +9,12 @@ export const getAllLabs = async () => {
   }
 };
 
-export const createLab = async (payload) => {
+export const getLabById = async (id) => {
   try {
-    const response = await apiClient.post("/labs", payload);
+    const response = await apiClient.get(`/labs/${id}`);
     return response.data;
   } catch (error) {
-    throw error.response?.data || { message: "Failed to create lab record" };
+    throw error.response?.data || { message: "Failed to fetch lab record" };
   }
 };
 
@@ -36,7 +36,11 @@ export const deleteLab = async (id) => {
   }
 };
 
-export const submitLabReport = async ({ patientPhoneNumber, description, report }) => {
+export const createLabReportByPhone = async ({
+  patientPhoneNumber,
+  description,
+  report,
+}) => {
   try {
     const formData = new FormData();
     formData.append("patientPhoneNumber", patientPhoneNumber);
@@ -44,19 +48,62 @@ export const submitLabReport = async ({ patientPhoneNumber, description, report 
     formData.append("report", report);
 
     const response = await apiClient.post("/lab/reports", formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
+      headers: { "Content-Type": "multipart/form-data" },
     });
     return response.data;
   } catch (error) {
-    throw error.response?.data || { message: "Failed to submit lab report" };
+    throw error.response?.data || { message: "Failed to create lab report" };
+  }
+};
+
+export const createLabReportByPatientId = async ({
+  patientId,
+  description,
+  report,
+}) => {
+  try {
+    const formData = new FormData();
+    formData.append("description", description);
+    formData.append("report", report);
+
+    const response = await apiClient.post(
+      `/lab/patients/${patientId}/reports`,
+      formData,
+      {
+        headers: { "Content-Type": "multipart/form-data" },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { message: "Failed to create lab report" };
   }
 };
 
 export const getLabReportsByPatientPhone = async (phoneNumber) => {
   try {
     const response = await apiClient.get(`/lab/patients/${phoneNumber}/reports`);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { message: "Failed to fetch lab reports" };
+  }
+};
+
+export const getLabReportPdf = async (reportId) => {
+  try {
+    const response = await apiClient.get(`/lab/reports/${reportId}/pdf`, {
+      responseType: "blob",
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { message: "Failed to fetch lab report PDF" };
+  }
+};
+
+export const getMyLabReports = async (patientId) => {
+  try {
+    const response = await apiClient.get("/patients/me/lab-reports", {
+      params: { patientId },
+    });
     return response.data;
   } catch (error) {
     throw error.response?.data || { message: "Failed to fetch lab reports" };

@@ -4,19 +4,20 @@ import LabDeleteModal from "../../Components/Lab/LabDeleteModal";
 import LabModal from "../../Components/Lab/LabModal";
 import LabStats from "../../Components/Lab/LabStats";
 import LabTable from "../../Components/Lab/LabTable";
-import PatientLabPortal from "../../Components/Lab/PatientLabPortal";
+import PatientLabReports from "../../Components/Lab/PatientLabReports";
 import {
   asArray,
-  buildLabPayload,
+  buildLabUpdatePayload,
   buildLabUserPayload,
   EMPTY_LAB_FORM,
   getLabId,
+  unwrapLab,
   validateLabForm,
 } from "../../Components/Lab/labUtils";
 import {
-  createLab,
   deleteLab,
   getAllLabs,
+  getLabById,
   updateLab,
 } from "../../Services/labService";
 import { registerLabUser } from "../../Services/authService";
@@ -25,8 +26,7 @@ import { getAuthData, ROLE } from "../../Utils/auth";
 export default function LabPage() {
   const authData = getAuthData();
   const canManageLabs = authData?.role === ROLE.ADMIN || authData?.role === ROLE.LAB;
-  const canSubmitReports =
-    authData?.role === ROLE.LAB || authData?.role === ROLE.PATIENT;
+  const isPatient = authData?.role === ROLE.PATIENT;
   const [labs, setLabs] = useState([]);
   const [search, setSearch] = useState("");
   const [modal, setModal] = useState(null);
@@ -43,7 +43,7 @@ export default function LabPage() {
       setLabs(asArray(data));
       setApiError("");
     } catch (error) {
-      setApiError(error.message || "Failed to load lab records.");
+      setApiError(error.message || "Failed to load lab accounts.");
       setLabs([]);
     } finally {
       setLoading(false);
@@ -56,11 +56,11 @@ export default function LabPage() {
   }, [fetchLabs]);
 
   const stats = useMemo(() => {
-    const activeCount = labs.filter((lab) => lab.status !== "INACTIVE").length;
+    const labRoleCount = labs.filter((lab) => lab.role === ROLE.LAB).length;
     return [
-      ["Total Tests", labs.length],
-      ["Active Tests", activeCount],
-      ["Inactive Tests", labs.length - activeCount],
+      ["Total Labs", labs.length],
+      ["Lab Accounts", labRoleCount],
+      ["Other Records", labs.length - labRoleCount],
     ];
   }, [labs]);
 
@@ -68,9 +68,11 @@ export default function LabPage() {
     const query = search.toLowerCase();
     return labs.filter(
       (lab) =>
-        lab.testName?.toLowerCase().includes(query) ||
-        lab.category?.toLowerCase().includes(query) ||
-        lab.description?.toLowerCase().includes(query)
+        lab.firstName?.toLowerCase().includes(query) ||
+        lab.lastName?.toLowerCase().includes(query) ||
+        lab.nic?.toLowerCase().includes(query) ||
+        lab.mobile?.toLowerCase().includes(query) ||
+        lab.email?.toLowerCase().includes(query)
     );
   }, [labs, search]);
 
@@ -81,27 +83,27 @@ export default function LabPage() {
     setModal("create");
   };
 
-  const openEdit = (lab) => {
-    setForm({
-      testName: lab.testName || "",
-      category: lab.category || "",
-      price: lab.price ?? "",
-      turnaroundTime: lab.turnaroundTime || "",
-      status: lab.status || "ACTIVE",
-      description: lab.description || "",
-      firstName: "",
-      lastName: "",
-      nic: "",
-      dob: "",
-      mobile: "",
-      address: "",
-      email: "",
-      password: "",
-      confirmPassword: "",
-    });
-    setSelected(lab);
-    setErrors({});
-    setModal("edit");
+  const openEdit = async (lab) => {
+    try {
+      setApiError("");
+      const latestLab = unwrapLab(await getLabById(getLabId(lab)));
+      setForm({
+        firstName: latestLab.firstName || "",
+        lastName: latestLab.lastName || "",
+        nic: latestLab.nic || "",
+        dob: latestLab.dob || "",
+        mobile: latestLab.mobile || "",
+        address: latestLab.address || "",
+        email: latestLab.email || "",
+        password: "",
+        confirmPassword: "",
+      });
+      setSelected(latestLab);
+      setErrors({});
+      setModal("edit");
+    } catch (error) {
+      setApiError(error.message || "Failed to load lab account.");
+    }
   };
 
   const openDelete = (lab) => {
@@ -137,14 +139,13 @@ export default function LabPage() {
       setApiError("");
       if (mode === "create") {
         await registerLabUser(buildLabUserPayload(form));
-        await createLab(buildLabPayload(form));
       } else {
-        await updateLab(getLabId(selected), buildLabPayload(form));
+        await updateLab(getLabId(selected), buildLabUpdatePayload(form));
       }
       await fetchLabs();
       closeModal();
     } catch (error) {
-      setApiError(error.message || `Failed to ${mode} lab record.`);
+      setApiError(error.message || `Failed to ${mode} lab account.`);
     }
   };
 
@@ -155,16 +156,20 @@ export default function LabPage() {
       await fetchLabs();
       closeModal();
     } catch (error) {
-      setApiError(error.message || "Failed to delete lab record.");
+      setApiError(error.message || "Failed to delete lab account.");
     }
   };
 
-  if (canSubmitReports) {
-    return <PatientLabPortal canSubmit labs={labs} />;
+  if (isPatient) {
+    return <PatientLabReports />;
   }
 
   if (!canManageLabs) {
-    return <PatientLabPortal labs={labs} />;
+    return (
+      <div className="rounded-xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-800">
+        You do not have permission to manage lab accounts.
+      </div>
+    );
   }
 
   return (
