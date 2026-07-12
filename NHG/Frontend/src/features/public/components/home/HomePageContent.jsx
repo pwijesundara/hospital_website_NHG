@@ -113,9 +113,9 @@ function HeroSection({ onBookAppointment }) {
             <Link className="px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-wider border border-slate-700 text-white hover:bg-slate-800/50 active:scale-98 transition-all" to="/doctors">
               Find a Doctor
             </Link>
-            <button className="px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-wider border border-teal-500/30 text-teal-300 bg-teal-500/5 hover:bg-teal-500/10 flex items-center gap-2 active:scale-98 transition-all">
+            {/* <button className="px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-wider border border-teal-500/30 text-teal-300 bg-teal-500/5 hover:bg-teal-500/10 flex items-center gap-2 active:scale-98 transition-all">
               <BotIcon /> AI Assistant
-            </button>
+            </button> */}
           </div>
         </div>
 
@@ -155,7 +155,7 @@ function QuickNav({ onBookAppointment }) {
     { icon: "👨‍⚕️", label: "Find a Doctor", sub: "Profiles & specialties" },
     { icon: "🏥", label: "Today's Clinics", sub: "Real-time updates" },
     { icon: "🚑", label: "Emergency Help", sub: "Ambulance response" },
-    { icon: "🤖", label: "AI Assistant", sub: "24/7 patient support" },
+   
   ];
   return (
     <div className="border-b border-slate-200 bg-white sticky top-0 z-40 shadow-sm overflow-hidden">
@@ -399,9 +399,9 @@ function SpecialistConsultants() {
                   <span>{d.specialization || "Specialist consultant"}</span>
                 </div>
               </div>
-              <button className="w-full py-2 rounded-xl text-xs font-bold border border-teal-800 text-teal-800 hover:bg-teal-50 transition-all">
+              {/* <button className="w-full py-2 rounded-xl text-xs font-bold border border-teal-800 text-teal-800 hover:bg-teal-50 transition-all">
                 Request Profile Channel
-              </button>
+              </button> */}
             </div>
           ))}
         </div>

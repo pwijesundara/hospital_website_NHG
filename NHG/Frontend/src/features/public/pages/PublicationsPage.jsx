@@ -418,8 +418,8 @@ export default function PublicationsPage() {
         )}
 
         {/* ── Submission CTA ── */}
-        <div className="mt-12 bg-gradient-to-r from-gray-50 to-white border border-gray-200 rounded-2xl p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 shadow-sm">
-          <div>
+        {/* <div className="mt-12 bg-gradient-to-r from-gray-50 to-white border border-gray-200 rounded-2xl p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 shadow-sm"> */}
+          {/* <div>
             <p className="text-sm font-bold text-gray-900 mb-1 tracking-tight">
               Submit a paper or resource
             </p>
@@ -428,11 +428,11 @@ export default function PublicationsPage() {
               for review via the medical library office — Room 204, Admin Block.
             </p>
           </div>
-          <div className="flex items-center gap-2.5 text-teal-700 bg-teal-50 border border-teal-100/50 px-4 py-2 rounded-xl flex-shrink-0 transition-all duration-300 hover:bg-teal-100/60 whitespace-nowrap">
+          {/* <div className="flex items-center gap-2.5 text-teal-700 bg-teal-50 border border-teal-100/50 px-4 py-2 rounded-xl flex-shrink-0 transition-all duration-300 hover:bg-teal-100/60 whitespace-nowrap">
             <i className="ti ti-send text-base" aria-hidden="true" />
             <span className="text-xs font-bold tracking-wide uppercase">Submit Manuscript</span>
-          </div>
-        </div>
+          </div> */}
+     
 
       </div>
       <Footer />

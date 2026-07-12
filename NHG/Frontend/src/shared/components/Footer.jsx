@@ -28,9 +28,8 @@ const cols = [
     title: "Patients",
     links: [
       { label: "Find a Doctor",    to: "/doctors" },
-      { label: "Patient Rights",   to: "/patient-rights" },
-      { label: "Patient Portal",   to: "/portal" },
-      { label: "Feedback",         to: "/feedback" },
+      
+      
     ],
   },
 ];
