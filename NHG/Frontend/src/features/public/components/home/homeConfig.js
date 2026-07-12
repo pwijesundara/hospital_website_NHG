@@ -8,34 +8,40 @@ export const LIVE_QUEUES = [
 
 export const SPECIALTIES = [
   {
-    icon: "Heart",
+    icon: "❤️",
     name: "Cardiology & ICU",
-    desc: "Cardiac cath, angiography, ECG, echocardiography, coronary care and advanced cardiac procedures.",
+    path: "/departments/cardiology-icu",
+    desc: "Cardiac cath, angiography, ECG, echocardiography, coronary care and advanced cardiac procedures."
   },
   {
-    icon: "Care",
+    icon: "🤱",
     name: "Maternity & Gynaecology",
-    desc: "Antenatal care, safe delivery, postnatal services, NICU and comprehensive gynaecological procedures.",
+    path: "/departments/Maternitygynaecology",
+    desc: "Antenatal care, safe delivery, postnatal services, NICU and comprehensive gynaecological procedures."
   },
   {
-    icon: "Surgery",
+    icon: "🔬",
     name: "Surgery",
-    desc: "General, orthopedic, laparoscopic, neuro and plastic surgeons with modern operation theatres.",
+    path: "/departments/surgery",
+    desc: "General, orthopedic, laparoscopic, neuro and plastic surgeons with modern operation theatres."
   },
   {
-    icon: "Child",
+    icon: "👶",
     name: "Pediatrics & Neonatology",
-    desc: "Children's ward, neonatal ICU, developmental clinics and child welfare services.",
+    path: "/departments/Pediatricsneonatology",
+    desc: "Children's ward, neonatal ICU, developmental clinics and child welfare services."
   },
   {
-    icon: "Scan",
+    icon: "📡",
     name: "Radiology & Imaging",
-    desc: "X-ray, CT scan, MRI, ultrasound and PACS-integrated digital imaging with 3T MRI.",
+    path: "/departments/radiologyimaging",
+    desc: "X-ray, CT scan, MRI, ultrasound and PACS-integrated digital imaging with 3T MRI."
   },
   {
-    icon: "Lab",
+    icon: "🧪",
     name: "Laboratory & Pathology",
-    desc: "Haematology, biochemistry, microbiology, histopathology with LIMS integration.",
+    path: "/departments/laboratorypathology",
+    desc: "Haematology, biochemistry, microbiology, histopathology with LIMS integration."
   },
 ];
 

@@ -4,6 +4,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { getAuthData } from "../utils/auth";
 import AuthModal from "./navbar/AuthModal";
 import MobileDrawer from "./navbar/MobileDrawer";
+import gLogo from "../../assets/glogo.png";
 import {
   activeNavLinkClass,
   LANGUAGES,
@@ -154,12 +155,18 @@ export default function Navbar() {
       <nav className="sticky top-0 z-50 w-full border-b border-white/5 bg-teal-950 shadow-lg">
         <div className="flex h-16 items-center gap-3 px-4 sm:h-20 sm:px-6 lg:px-8">
           <Link to="/" className="flex shrink-0 items-center gap-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white shadow-md sm:h-11 sm:w-11">
-              <span className="text-[10px] font-black text-teal-950">NHG</span>
+            <div className="flex h-9 w-9 items-center justify-center rounded-full  shadow-md sm:h-11 sm:w-11">
+              <img src={gLogo} alt="NHG Logo" className="h-full w-full object-contain" />
             </div>
             <div className="text-white">
-              <div className="text-sm font-extrabold leading-tight sm:text-base">
+              <div className="text-[12px] font-medium leading-tight sm:text-xs">
                 National Hospital Galle
+              </div>
+             <div className="text-[10px] font-medium leading-tight sm:text-xs">
+               ජාතික රෝහල ගාල්ල 
+              </div>
+             <div className="text-[10px] font-medium leading-tight sm:text-xs">
+                தேசிய மருத்துவமனை காலி
               </div>
             </div>
           </Link>
