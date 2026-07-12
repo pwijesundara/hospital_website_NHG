@@ -1,71 +1,11 @@
-import {
-  Building2,
-  CalendarCheck,
-  Home,
-  LayoutDashboard,
-  LogOut,
-  Microscope,
-  Stethoscope,
-  UserCog,
-  Users,
-} from "lucide-react";
+import { Home, LogOut } from "lucide-react";
 import { Outlet, NavLink, useNavigate } from "react-router-dom";
 import { getAuthData, hasRole, ROLE } from "../../../shared/utils/auth";
-
-const DASHBOARD_LINKS = [
-  {
-    label: "Dashboard",
-    to: "/dashboard",
-    end: true,
-    icon: LayoutDashboard,
-    roles: [ROLE.ADMIN, ROLE.CONSULTANT, ROLE.DOCTOR, ROLE.LAB, ROLE.NURSE, ROLE.PATIENT],
-  },
-  {
-    label: "Doctors",
-    to: "/dashboard/doctors",
-    icon: Stethoscope,
-    roles: [ROLE.ADMIN],
-  },
-  {
-    label: "Clinics",
-    to: "/dashboard/clinics",
-    icon: Building2,
-    roles: [ROLE.CONSULTANT, ROLE.DOCTOR, ROLE.PATIENT],
-  },
-  {
-    label: "Patients",
-    to: "/dashboard/patients",
-    icon: Users,
-    roles: [ROLE.ADMIN, ROLE.DOCTOR],
-  },
-  {
-    label: "Staff Accounts",
-    to: "/dashboard/staff",
-    icon: UserCog,
-    roles: [ROLE.ADMIN],
-  },
-  {
-    label: "Labs",
-    to: "/dashboard/labs",
-    icon: Microscope,
-    roles: [ROLE.ADMIN, ROLE.LAB, ROLE.PATIENT],
-  },
-  {
-    label: "My Requests",
-    to: "/dashboard/appointment-requests",
-    icon: CalendarCheck,
-    roles: [ROLE.CONSULTANT, ROLE.PATIENT],
-  },
-];
-
-const ROLE_LABELS = {
-  [ROLE.ADMIN]: "Admin Management",
-  [ROLE.CONSULTANT]: "Consultant Workspace",
-  [ROLE.DOCTOR]: "Doctor Workspace",
-  [ROLE.LAB]: "Lab Workspace",
-  [ROLE.NURSE]: "Nurse Workspace",
-  [ROLE.PATIENT]: "Patient Portal",
-};
+import {
+  DASHBOARD_LINKS,
+  getDashboardLinkLabel,
+  ROLE_LABELS,
+} from "../config/dashboardConfig";
 
 function DashboardLayout() {
   const navigate = useNavigate();
@@ -102,15 +42,7 @@ function DashboardLayout() {
           {visibleLinks.map(({ label, to, end, icon: Icon }) => (
             <NavLink key={to} to={to} end={end} className={activeStyle}>
               <Icon size={18} />
-              {role === ROLE.DOCTOR && label === "Clinics"
-                ? "My Clinics"
-                : role === ROLE.PATIENT && label === "Clinics"
-                  ? "Clinics & Sessions"
-                  : role === ROLE.PATIENT && label === "Labs"
-                    ? "My Lab Reports"
-                    : role === ROLE.CONSULTANT && label === "My Requests"
-                      ? "Appointment Requests"
-                    : label}
+              {getDashboardLinkLabel(label, role)}
             </NavLink>
           ))}
         </nav>

@@ -8,7 +8,7 @@ import {
   deletePatient,
   getAllPatients,
   updatePatient,
-} from "../services/patientServices";
+} from "../services/patientService";
 
 const BLOOD_GROUPS = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 

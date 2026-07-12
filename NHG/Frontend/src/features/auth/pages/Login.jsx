@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Plus, X } from "lucide-react";
-import { loginUser } from "../../auth/services/authService";
+import { loginUser } from "../services/authService";
 
 export default function Login({ onClose, onSwitchToRegister }) {
   const [identifier, setIdentifier] = useState("");

@@ -7,13 +7,8 @@ export const ROLE = {
   PATIENT: "PATIENT",
 };
 
-const ROLE_ALIASES = {
-  ADIMN: ROLE.ADMIN,
-};
-
 export const normalizeRole = (role) => {
-  const normalizedRole = String(role || "").trim().toUpperCase();
-  return ROLE_ALIASES[normalizedRole] || normalizedRole;
+  return String(role || "").trim().toUpperCase();
 };
 
 export const getAuthData = () => {

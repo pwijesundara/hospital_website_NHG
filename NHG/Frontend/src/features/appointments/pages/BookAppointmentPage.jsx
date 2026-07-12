@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import AppointmentSuccess from "../components/AppointmentSuccess";
 import BookAppointmentForm from "../components/BookAppointmentForm";
-import { EMPTY_APPOINTMENT_FORM } from "../components/bookAppointmentData";
+import { EMPTY_APPOINTMENT_FORM } from "../data/bookAppointmentData";
 import Footer from "../../../shared/components/Footer";
 import Navbar from "../../../shared/components/Navbar";
 import { requestAppointment } from "../services/appointmentService";
-import { getPatientById } from "../../patients/services/patientServices";
+import { getPatientById } from "../../patients/services/patientService";
 import { getAuthData } from "../../../shared/utils/auth";
 
 const getAuthPatientId = (authData) =>

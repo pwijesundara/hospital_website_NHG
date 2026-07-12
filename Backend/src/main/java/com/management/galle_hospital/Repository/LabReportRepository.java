@@ -8,6 +8,8 @@ import java.util.List;
 
 @Repository
 public interface LabReportRepository extends JpaRepository<LabReport, Long> {
+    List<LabReport> findAllByOrderBySubmittedAtDesc();
+
     List<LabReport> findByPatientPhoneNumberOrderBySubmittedAtDesc(String patientPhoneNumber);
 
     List<LabReport> findByPatientIdOrderBySubmittedAtDesc(Long patientId);

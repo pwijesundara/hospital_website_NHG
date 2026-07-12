@@ -29,6 +29,11 @@ public class LabController {
         return labReportService.submitReport(patientPhoneNumber, description, report);
     }
 
+    @GetMapping("/reports")
+    public List<LabReportResponse> getAllReports() {
+        return labReportService.getAllReports();
+    }
+
     @PostMapping("/patients/{patientId}/reports")
     public ResponseEntity<?> submitReportForPatient(
             @PathVariable Long patientId,
@@ -38,7 +43,12 @@ public class LabController {
         return labReportService.submitReportForPatient(patientId, description, report);
     }
 
-    @GetMapping("/patients/{phoneNumber}/reports")
+    @GetMapping("/patients/{patientId}/reports")
+    public ResponseEntity<?> getReportsByPatientId(@PathVariable Long patientId) {
+        return labReportService.getReportsByPatientId(patientId);
+    }
+
+    @GetMapping("/patients/phone/{phoneNumber}/reports")
     public List<LabReportResponse> getReportsByPatientPhoneNumber(@PathVariable String phoneNumber) {
         return labReportService.getReportsByPatientPhoneNumber(phoneNumber);
     }

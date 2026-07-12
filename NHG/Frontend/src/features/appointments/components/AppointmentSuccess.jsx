@@ -1,6 +1,6 @@
 import Footer from "../../../shared/components/Footer";
 import Navbar from "../../../shared/components/Navbar";
-import { departments } from "./bookAppointmentData";
+import { departments } from "../data/bookAppointmentData";
 import { IconWrapper } from "./bookAppointmentUi";
 
 export default function AppointmentSuccess({ form, refNo, onReset }) {

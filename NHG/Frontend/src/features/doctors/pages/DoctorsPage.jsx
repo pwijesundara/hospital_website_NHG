@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Navbar from "../../../shared/components/Navbar";
 import Footer from "../../../shared/components/Footer";
-import { getAllDoctors } from "../../doctors/services/doctorService";
+import { getAllDoctors } from "../services/doctorService";
 
 const departmentStyles = [
   {

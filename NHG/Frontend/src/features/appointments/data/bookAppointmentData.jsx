@@ -1,0 +1,58 @@
+export const EMPTY_APPOINTMENT_FORM = {
+  firstName: "",
+  lastName: "",
+  dob: "",
+  gender: "",
+  nic: "",
+  phone: "",
+  email: "",
+  address: "",
+  type: "",
+  department: "",
+  doctor: "",
+  date: "",
+  time: "",
+  reason: "",
+  existing: "no",
+  referral: "no",
+  referralDoc: "",
+  lang: "English",
+  consent: false,
+};
+
+export const departments = [
+  { value: "", label: "Select department" },
+  { value: "emergency", label: "Emergency & Critical Care" },
+  { value: "cardiology", label: "Cardiology" },
+  { value: "neurology", label: "Neurology" },
+  { value: "surgery", label: "Surgery" },
+  { value: "obgyn", label: "Obstetrics & Gynaecology" },
+  { value: "paediatrics", label: "Paediatrics" },
+  { value: "medicine", label: "Internal Medicine" },
+  { value: "ortho", label: "Orthopaedics" },
+  { value: "ent", label: "ENT" },
+  { value: "ophthalmology", label: "Ophthalmology" },
+  { value: "radiology", label: "Radiology & Diagnostics" },
+  { value: "dermatology", label: "Dermatology" },
+  { value: "psychiatry", label: "Psychiatry" },
+  { value: "dental", label: "Dental & Oral Health" },
+];
+
+export const timeSlots = [
+  "08:00",
+  "08:30",
+  "09:00",
+  "09:30",
+  "10:00",
+  "10:30",
+  "11:00",
+  "11:30",
+  "13:00",
+  "13:30",
+  "14:00",
+  "14:30",
+  "15:00",
+  "15:30",
+];
+
+export const prefLangs = ["English", "Sinhala", "Tamil"];

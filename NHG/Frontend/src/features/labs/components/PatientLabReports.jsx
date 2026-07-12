@@ -1,8 +1,8 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   createLabReportByPatientId,
   getLabReportPdf,
-  getMyLabReports,
+  getLabReportsByPatientId,
 } from "../services/labService";
 import { getAuthData } from "../../../shared/utils/auth";
 import { asArray } from "./labUtils";
@@ -27,6 +27,16 @@ export default function PatientLabReports() {
   const [submitError, setSubmitError] = useState("");
   const [success, setSuccess] = useState("");
 
+  const patientSentReports = useMemo(
+    () => reports.filter((report) => report.reportSource === "PATIENT"),
+    [reports]
+  );
+
+  const labSentReports = useMemo(
+    () => reports.filter((report) => report.reportSource !== "PATIENT"),
+    [reports]
+  );
+
   const fetchReports = useCallback(async () => {
     if (!patientId) {
       setReports([]);
@@ -37,7 +47,7 @@ export default function PatientLabReports() {
     try {
       setLoading(true);
       setError("");
-      const data = await getMyLabReports(patientId);
+      const data = await getLabReportsByPatientId(patientId);
       setReports(asArray(data));
     } catch (err) {
       setReports([]);
@@ -83,15 +93,15 @@ export default function PatientLabReports() {
         description: form.description.trim(),
         report: form.report,
       });
-      setSuccess("Lab report created successfully.");
+      setSuccess("Lab report sent successfully.");
       setForm({
-        patientPhoneNumber: "",
+        patientPhoneNumber: authData?.mobile || authData?.phone || authData?.phoneNumber || "",
         description: "",
         report: null,
       });
       await fetchReports();
     } catch (err) {
-      setSubmitError(err.message || "Failed to create lab report.");
+      setSubmitError(err.message || "Failed to send lab report.");
     } finally {
       setSubmitting(false);
     }
@@ -118,7 +128,7 @@ export default function PatientLabReports() {
           My Lab Reports
         </h1>
         <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
-          View lab reports linked to your patient account.
+          Send reports to the hospital and view reports sent back by the lab.
         </p>
       </div>
 
@@ -129,6 +139,8 @@ export default function PatientLabReports() {
         onChange={change}
         onFileChange={(file) => change("report", file)}
         onSubmit={submitReport}
+        showPatientPhone={false}
+        submitLabel="Send Report"
         success={success}
       />
 
@@ -139,9 +151,19 @@ export default function PatientLabReports() {
       )}
 
       <PatientLabUploadsList
+        emptyMessage="No reports sent by you yet."
         loading={loading}
         onDownloadPdf={downloadPdf}
-        reports={reports}
+        reports={patientSentReports}
+        title="I Sent Reports"
+      />
+
+      <PatientLabUploadsList
+        emptyMessage="No lab-sent reports found for your account."
+        loading={loading}
+        onDownloadPdf={downloadPdf}
+        reports={labSentReports}
+        title="Lab Sent To Me"
       />
     </div>
   );

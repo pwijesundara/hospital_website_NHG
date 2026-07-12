@@ -1,4 +1,4 @@
-import { prefLangs, timeSlots } from "./bookAppointmentData";
+import { prefLangs, timeSlots } from "../data/bookAppointmentData";
 import { Field, inputBase, SectionHeader } from "./bookAppointmentUi";
 
 export default function ScheduleSection({ form, onChange }) {

@@ -40,7 +40,7 @@ public class LabReportService {
         }
 
         try {
-            LabReport savedReport = labReportRepository.save(buildReport(patient, description, report));
+            LabReport savedReport = labReportRepository.save(buildReport(patient, description, report, "LAB"));
             return ResponseEntity.status(HttpStatus.CREATED).body(new LabReportResponse(savedReport));
         } catch (IOException exception) {
             return error("Could not read report PDF", HttpStatus.BAD_REQUEST);
@@ -58,7 +58,7 @@ public class LabReportService {
         return patientRepository.findById(patientId)
                 .<ResponseEntity<?>>map(patient -> {
                     try {
-                        LabReport savedReport = labReportRepository.save(buildReport(patient, description, report));
+                        LabReport savedReport = labReportRepository.save(buildReport(patient, description, report, "PATIENT"));
                         return ResponseEntity.status(HttpStatus.CREATED).body(new LabReportResponse(savedReport));
                     } catch (IOException exception) {
                         return error("Could not read report PDF", HttpStatus.BAD_REQUEST);
@@ -69,6 +69,13 @@ public class LabReportService {
 
     public List<LabReportResponse> getReportsByPatientPhoneNumber(String patientPhoneNumber) {
         return labReportRepository.findByPatientPhoneNumberOrderBySubmittedAtDesc(patientPhoneNumber)
+                .stream()
+                .map(LabReportResponse::new)
+                .toList();
+    }
+
+    public List<LabReportResponse> getAllReports() {
+        return labReportRepository.findAllByOrderBySubmittedAtDesc()
                 .stream()
                 .map(LabReportResponse::new)
                 .toList();
@@ -98,12 +105,13 @@ public class LabReportService {
                 .orElseGet(() -> error("Lab report not found", HttpStatus.NOT_FOUND));
     }
 
-    private LabReport buildReport(Patient patient, String description, MultipartFile report) throws IOException {
+    private LabReport buildReport(Patient patient, String description, MultipartFile report, String reportSource) throws IOException {
         LabReport labReport = new LabReport();
         labReport.setPatientPhoneNumber(patient.getMobile());
         labReport.setDescription(description.trim());
         labReport.setFileName(report.getOriginalFilename());
         labReport.setContentType(MediaType.APPLICATION_PDF_VALUE);
+        labReport.setReportSource(reportSource);
         labReport.setSubmittedAt(LocalDateTime.now());
         labReport.setReportPdf(report.getBytes());
         labReport.setPatient(patient);
