@@ -6,11 +6,17 @@ const formatSubmittedAt = (submittedAt) => {
   return Number.isNaN(date.getTime()) ? submittedAt : date.toLocaleString();
 };
 
-export default function PatientLabUploadsList({ loading, onDownloadPdf, reports }) {
+export default function PatientLabUploadsList({
+  emptyMessage = "No lab reports found for your patient account.",
+  loading,
+  onDownloadPdf,
+  reports,
+  title = "My Lab Reports",
+}) {
   return (
     <div className="rounded-xl border border-slate-200 bg-white">
       <div className="border-b border-slate-200 p-4">
-        <h2 className="font-semibold text-[#002325]">My Lab Reports</h2>
+        <h2 className="font-semibold text-[#002325]">{title}</h2>
         <p className="mt-1 text-sm text-slate-500">
           {reports.length} records found
         </p>
@@ -62,7 +68,7 @@ export default function PatientLabUploadsList({ loading, onDownloadPdf, reports 
         </div>
       ) : (
         <div className="px-5 py-10 text-center text-sm text-slate-500">
-          No lab reports found for your patient account.
+          {emptyMessage}
         </div>
       )}
     </div>

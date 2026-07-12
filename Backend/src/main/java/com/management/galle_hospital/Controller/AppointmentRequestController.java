@@ -28,6 +28,11 @@ public class AppointmentRequestController {
         return appointmentRequestService.createAppointmentRequest(request);
     }
 
+    @GetMapping("/requests")
+    public List<AppointmentRequestResponse> getAllRequests() {
+        return appointmentRequestService.getAllRequests();
+    }
+
     @GetMapping("/patients/{patientId}/requests")
     public List<AppointmentRequestResponse> getRequestsByPatient(@PathVariable Long patientId) {
         return appointmentRequestService.getRequestsByPatient(patientId);
@@ -39,6 +44,11 @@ public class AppointmentRequestController {
             @RequestParam(required = false) AppointmentStatus status
     ) {
         return appointmentRequestService.getRequestsByConsultant(consultantId, status);
+    }
+
+    @GetMapping("/doctors/{doctorId}/accepted-requests")
+    public ResponseEntity<?> getAcceptedRequestsByDoctor(@PathVariable Long doctorId) {
+        return appointmentRequestService.getAcceptedRequestsByDoctor(doctorId);
     }
 
     @PatchMapping("/requests/{requestId}/accept")

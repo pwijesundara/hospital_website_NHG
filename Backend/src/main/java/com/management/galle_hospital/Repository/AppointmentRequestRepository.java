@@ -9,11 +9,15 @@ import java.util.List;
 
 @Repository
 public interface AppointmentRequestRepository extends JpaRepository<AppointmentRequest, Long> {
+    List<AppointmentRequest> findAllByOrderByRequestedAtDesc();
+
     List<AppointmentRequest> findByPatientIdOrderByRequestedAtDesc(Long patientId);
 
     List<AppointmentRequest> findByClinicSessionClinicConsultantIdOrderByRequestedAtDesc(Long consultantId);
 
     List<AppointmentRequest> findByClinicSessionClinicConsultantIdAndStatusOrderByRequestedAtDesc(Long consultantId, AppointmentStatus status);
+
+    List<AppointmentRequest> findByClinicSessionClinicDoctorsIdAndStatusOrderByAcceptedAtDesc(Long doctorId, AppointmentStatus status);
 
     long countByClinicSessionIdAndStatus(Long clinicSessionId, AppointmentStatus status);
 

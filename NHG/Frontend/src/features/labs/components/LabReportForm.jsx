@@ -9,6 +9,8 @@ export default function LabReportForm({
   onChange,
   onFileChange,
   onSubmit,
+  showPatientPhone = true,
+  submitLabel = "Create Report",
   success,
 }) {
   const fileInputRef = useRef(null);
@@ -42,14 +44,16 @@ export default function LabReportForm({
       )}
 
       <div className="grid gap-4 md:grid-cols-2">
-        <LabField label="Patient Phone Number">
-          <input
-            value={form.patientPhoneNumber}
-            onChange={(event) => onChange("patientPhoneNumber", event.target.value)}
-            className="w-full rounded-lg border border-slate-200 px-4 py-2.5 text-sm outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
-            placeholder="0771234567"
-          />
-        </LabField>
+        {showPatientPhone && (
+          <LabField label="Patient Phone Number">
+            <input
+              value={form.patientPhoneNumber}
+              onChange={(event) => onChange("patientPhoneNumber", event.target.value)}
+              className="w-full rounded-lg border border-slate-200 px-4 py-2.5 text-sm outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+              placeholder="0771234567"
+            />
+          </LabField>
+        )}
 
         <div className="md:col-span-2">
           <LabField label="PDF Report">
@@ -80,7 +84,7 @@ export default function LabReportForm({
         disabled={loading}
         className="mt-5 inline-flex items-center justify-center gap-2 rounded-lg bg-[#1f6b50] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#19553f] disabled:opacity-60"
       >
-        <Upload size={17} /> {loading ? "Uploading..." : "Create Report"}
+        <Upload size={17} /> {loading ? "Uploading..." : submitLabel}
       </button>
     </form>
   );

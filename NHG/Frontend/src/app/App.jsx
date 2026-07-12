@@ -24,6 +24,7 @@ import PatientPage from "../features/patients/pages/PatientPage";
 import LabPage from "../features/labs/pages/LabPage";
 import StaffAccountsPage from "../features/staff/pages/StaffAccountsPage";
 import AppointmentRequestsPage from "../features/dashboard/pages/AppointmentRequestsPage";
+import DoctorSessionPatientsPage from "../features/dashboard/pages/DoctorSessionPatientsPage";
 import { getAuthData, hasRole, ROLE } from "../shared/utils/auth";
 
 const PUBLIC_ROUTES = [
@@ -71,6 +72,11 @@ const DASHBOARD_ROUTES = [
     path: "appointment-requests",
     element: <AppointmentRequestsPage />,
     roles: [ROLE.CONSULTANT, ROLE.PATIENT],
+  },
+  {
+    path: "session-patients",
+    element: <DoctorSessionPatientsPage />,
+    roles: [ROLE.DOCTOR],
   },
 ];
 

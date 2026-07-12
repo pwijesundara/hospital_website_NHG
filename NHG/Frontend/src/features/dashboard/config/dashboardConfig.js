@@ -46,6 +46,12 @@ export const DASHBOARD_LINKS = [
     roles: [ROLE.ADMIN, ROLE.DOCTOR],
   },
   {
+    label: "Session Patients",
+    to: "/dashboard/session-patients",
+    icon: UserRound,
+    roles: [ROLE.DOCTOR],
+  },
+  {
     label: "Staff Accounts",
     to: "/dashboard/staff",
     icon: UserCog,
@@ -117,6 +123,12 @@ export const DASHBOARD_HOME_CONTENT = {
         icon: ClipboardList,
       },
       {
+        title: "Session Patients",
+        description: "View accepted patients coming for your assigned sessions.",
+        to: "/dashboard/session-patients",
+        icon: UserRound,
+      },
+      {
         title: "Patients",
         description: "Access patient details and medical records.",
         to: "/dashboard/patients",
@@ -145,11 +157,11 @@ export const DASHBOARD_HOME_CONTENT = {
   },
   [ROLE.LAB]: {
     title: "Lab Dashboard",
-    description: "Manage laboratory tests and diagnostic workflows.",
+    description: "Upload patient laboratory reports and diagnostic documents.",
     cards: [
       {
-        title: "Labs",
-        description: "Create, update, and manage laboratory test records.",
+        title: "Add Lab Report",
+        description: "Create a patient lab report using their phone number.",
         to: "/dashboard/labs",
         icon: Microscope,
       },
@@ -197,6 +209,7 @@ export const getDashboardLinkLabel = (label, role) => {
   if (role === ROLE.DOCTOR && label === "Clinics") return "My Clinics";
   if (role === ROLE.PATIENT && label === "Clinics") return "Clinics & Sessions";
   if (role === ROLE.PATIENT && label === "Labs") return "My Lab Reports";
+  if (role === ROLE.LAB && label === "Labs") return "Add Lab Report";
   if (role === ROLE.CONSULTANT && label === "My Requests") {
     return "Appointment Requests";
   }

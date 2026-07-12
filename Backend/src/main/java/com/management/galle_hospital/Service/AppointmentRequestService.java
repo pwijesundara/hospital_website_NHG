@@ -80,6 +80,13 @@ public class AppointmentRequestService {
                 .toList();
     }
 
+    public List<AppointmentRequestResponse> getAllRequests() {
+        return appointmentRequestRepository.findAllByOrderByRequestedAtDesc()
+                .stream()
+                .map(AppointmentRequestResponse::new)
+                .toList();
+    }
+
     public ResponseEntity<?> getRequestsByConsultant(Long consultantId, AppointmentStatus status) {
         ResponseEntity<Map<String, String>> consultantError = validateConsultant(consultantId);
         if (consultantError != null) {
@@ -89,6 +96,21 @@ public class AppointmentRequestService {
         List<AppointmentRequest> requests = status == null
                 ? appointmentRequestRepository.findByClinicSessionClinicConsultantIdOrderByRequestedAtDesc(consultantId)
                 : appointmentRequestRepository.findByClinicSessionClinicConsultantIdAndStatusOrderByRequestedAtDesc(consultantId, status);
+
+        return ResponseEntity.ok(requests.stream().map(AppointmentRequestResponse::new).toList());
+    }
+
+    public ResponseEntity<?> getAcceptedRequestsByDoctor(Long doctorId) {
+        ResponseEntity<Map<String, String>> doctorError = validateDoctor(doctorId);
+        if (doctorError != null) {
+            return doctorError;
+        }
+
+        List<AppointmentRequest> requests =
+                appointmentRequestRepository.findByClinicSessionClinicDoctorsIdAndStatusOrderByAcceptedAtDesc(
+                        doctorId,
+                        AppointmentStatus.ACCEPTED
+                );
 
         return ResponseEntity.ok(requests.stream().map(AppointmentRequestResponse::new).toList());
     }
@@ -153,6 +175,20 @@ public class AppointmentRequestService {
         }
         if (consultant.get().getRole() != Role.CONSULTANT) {
             return error("consultantId must belong to a CONSULTANT user", HttpStatus.BAD_REQUEST);
+        }
+        return null;
+    }
+
+    private ResponseEntity<Map<String, String>> validateDoctor(Long doctorId) {
+        if (doctorId == null) {
+            return error("doctorId is required", HttpStatus.BAD_REQUEST);
+        }
+        var doctor = userRepository.findById(doctorId);
+        if (doctor.isEmpty()) {
+            return error("Doctor not found", HttpStatus.NOT_FOUND);
+        }
+        if (doctor.get().getRole() != Role.DOCTOR) {
+            return error("doctorId must belong to a DOCTOR user", HttpStatus.BAD_REQUEST);
         }
         return null;
     }

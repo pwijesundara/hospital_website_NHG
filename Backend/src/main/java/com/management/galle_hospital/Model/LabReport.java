@@ -33,6 +33,8 @@ public class LabReport {
 
     private String contentType;
 
+    private String reportSource;
+
     private LocalDateTime submittedAt;
 
     @JsonIgnore

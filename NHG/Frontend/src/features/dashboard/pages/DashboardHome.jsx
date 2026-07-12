@@ -1,11 +1,16 @@
 import { Link } from "react-router-dom";
 import { getAuthData, ROLE } from "../../../shared/utils/auth";
+import AdminDashboardAnalytics from "../components/AdminDashboardAnalytics";
 import { DASHBOARD_HOME_CONTENT } from "../config/dashboardConfig";
 
 function DashboardHome() {
   const authData = getAuthData();
   const role = authData?.role || ROLE.PATIENT;
   const content = DASHBOARD_HOME_CONTENT[role] || DASHBOARD_HOME_CONTENT[ROLE.PATIENT];
+
+  if (role === ROLE.ADMIN) {
+    return <AdminDashboardAnalytics />;
+  }
 
   return (
     <div className="space-y-6">

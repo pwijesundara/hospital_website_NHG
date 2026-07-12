@@ -18,6 +18,15 @@ export const getPatientAppointmentRequests = async (patientId) => {
   }
 };
 
+export const getAllAppointmentRequests = async () => {
+  try {
+    const response = await apiClient.get("/appointments/requests");
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { message: "Failed to fetch appointment requests" };
+  }
+};
+
 export const getConsultantAppointmentRequests = async (consultantId, status = "") => {
   try {
     const response = await apiClient.get(
@@ -29,6 +38,17 @@ export const getConsultantAppointmentRequests = async (consultantId, status = ""
     return response.data;
   } catch (error) {
     throw error.response?.data || { message: "Failed to fetch appointment requests" };
+  }
+};
+
+export const getDoctorAcceptedAppointmentRequests = async (doctorId) => {
+  try {
+    const response = await apiClient.get(
+      `/appointments/doctors/${doctorId}/accepted-requests`
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { message: "Failed to fetch session patients" };
   }
 };
 

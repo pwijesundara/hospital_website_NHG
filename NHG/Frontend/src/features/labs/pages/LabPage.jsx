@@ -4,6 +4,7 @@ import LabDeleteModal from "../components/LabDeleteModal";
 import LabModal from "../components/LabModal";
 import LabStats from "../components/LabStats";
 import LabTable from "../components/LabTable";
+import LabReportCreatePortal from "../components/LabReportCreatePortal";
 import PatientLabReports from "../components/PatientLabReports";
 import {
   asArray,
@@ -25,7 +26,8 @@ import { getAuthData, ROLE } from "../../../shared/utils/auth";
 
 export default function LabPage() {
   const authData = getAuthData();
-  const canManageLabs = authData?.role === ROLE.ADMIN || authData?.role === ROLE.LAB;
+  const canManageLabs = authData?.role === ROLE.ADMIN;
+  const canCreateLabReports = authData?.role === ROLE.LAB;
   const isPatient = authData?.role === ROLE.PATIENT;
   const [labs, setLabs] = useState([]);
   const [search, setSearch] = useState("");
@@ -164,10 +166,14 @@ export default function LabPage() {
     return <PatientLabReports />;
   }
 
+  if (canCreateLabReports) {
+    return <LabReportCreatePortal />;
+  }
+
   if (!canManageLabs) {
     return (
       <div className="rounded-xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-800">
-        You do not have permission to manage lab accounts.
+        You do not have permission to access lab features.
       </div>
     );
   }
