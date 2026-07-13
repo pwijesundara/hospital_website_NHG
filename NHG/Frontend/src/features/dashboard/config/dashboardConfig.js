@@ -64,6 +64,12 @@ export const DASHBOARD_LINKS = [
     roles: [ROLE.ADMIN, ROLE.LAB, ROLE.PATIENT],
   },
   {
+    label: "My Profile",
+    to: "/dashboard/profile",
+    icon: UserRound,
+    roles: [ROLE.PATIENT],
+  },
+  {
     label: "My Requests",
     to: "/dashboard/appointment-requests",
     icon: CalendarCheck,
@@ -185,7 +191,7 @@ export const DASHBOARD_HOME_CONTENT = {
       },
       {
         title: "My Lab Reports",
-        description: "View lab reports linked to your patient account.",
+        description: "View reports sent by the lab to your patient account.",
         to: "/dashboard/labs",
         icon: Microscope,
       },
@@ -197,8 +203,8 @@ export const DASHBOARD_HOME_CONTENT = {
       },
       {
         title: "My Profile",
-        description: "Your patient account is signed in and ready.",
-        to: "/dashboard",
+        description: "View your registered patient details.",
+        to: "/dashboard/profile",
         icon: UserRound,
       },
     ],

@@ -221,7 +221,7 @@ function BookingSection() {
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-      alert(`Success! Check SMS queue alerts dispatched for target registry reference ID.`);
+      alert(`Success! Check SMS queue alerts dispatched for your registry reference.`);
     }, 1200);
   };
 

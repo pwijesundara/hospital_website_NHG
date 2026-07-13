@@ -1,12 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
-  createLabReportByPatientId,
   getLabReportPdf,
   getLabReportsByPatientId,
 } from "../services/labService";
 import { getAuthData } from "../../../shared/utils/auth";
 import { asArray } from "./labUtils";
-import LabReportForm from "./LabReportForm";
 import PatientLabUploadsList from "./PatientLabUploadsList";
 
 const getAuthPatientId = (authData) =>
@@ -16,21 +14,8 @@ export default function PatientLabReports() {
   const authData = getAuthData();
   const patientId = getAuthPatientId(authData);
   const [reports, setReports] = useState([]);
-  const [form, setForm] = useState({
-    patientPhoneNumber: authData?.mobile || authData?.phone || authData?.phoneNumber || "",
-    description: "",
-    report: null,
-  });
   const [loading, setLoading] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
-  const [submitError, setSubmitError] = useState("");
-  const [success, setSuccess] = useState("");
-
-  const patientSentReports = useMemo(
-    () => reports.filter((report) => report.reportSource === "PATIENT"),
-    [reports]
-  );
 
   const labSentReports = useMemo(
     () => reports.filter((report) => report.reportSource !== "PATIENT"),
@@ -62,51 +47,6 @@ export default function PatientLabReports() {
     return () => clearTimeout(timer);
   }, [fetchReports]);
 
-  const change = (field, value) => {
-    setForm((currentForm) => ({ ...currentForm, [field]: value }));
-    setSubmitError("");
-    setSuccess("");
-  };
-
-  const submitReport = async (event) => {
-    event.preventDefault();
-    setSubmitError("");
-    setSuccess("");
-
-    if (!patientId) {
-      setSubmitError("Patient account is missing from your login session.");
-      return;
-    }
-    if (!form.description.trim()) {
-      setSubmitError("Description is required.");
-      return;
-    }
-    if (!form.report) {
-      setSubmitError("Please choose a PDF report.");
-      return;
-    }
-
-    try {
-      setSubmitting(true);
-      await createLabReportByPatientId({
-        patientId,
-        description: form.description.trim(),
-        report: form.report,
-      });
-      setSuccess("Lab report sent successfully.");
-      setForm({
-        patientPhoneNumber: authData?.mobile || authData?.phone || authData?.phoneNumber || "",
-        description: "",
-        report: null,
-      });
-      await fetchReports();
-    } catch (err) {
-      setSubmitError(err.message || "Failed to send lab report.");
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
   const downloadPdf = async (report) => {
     try {
       const pdf = await getLabReportPdf(report.id);
@@ -128,35 +68,15 @@ export default function PatientLabReports() {
           My Lab Reports
         </h1>
         <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
-          Send reports to the hospital and view reports sent back by the lab.
+          View PDF reports sent by the laboratory team to your patient account.
         </p>
       </div>
-
-      <LabReportForm
-        error={submitError}
-        form={form}
-        loading={submitting}
-        onChange={change}
-        onFileChange={(file) => change("report", file)}
-        onSubmit={submitReport}
-        showPatientPhone={false}
-        submitLabel="Send Report"
-        success={success}
-      />
 
       {error && (
         <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
           {error}
         </div>
       )}
-
-      <PatientLabUploadsList
-        emptyMessage="No reports sent by you yet."
-        loading={loading}
-        onDownloadPdf={downloadPdf}
-        reports={patientSentReports}
-        title="I Sent Reports"
-      />
 
       <PatientLabUploadsList
         emptyMessage="No lab-sent reports found for your account."

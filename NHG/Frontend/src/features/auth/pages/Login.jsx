@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Plus, X } from "lucide-react";
 import { loginUser } from "../services/authService";
+import { saveAuthData } from "../../../utils/authStorage";
 
 export default function Login({ onClose, onSwitchToRegister }) {
   const [identifier, setIdentifier] = useState("");
@@ -26,9 +27,7 @@ export default function Login({ onClose, onSwitchToRegister }) {
     try {
       const data = await loginUser(identifier, password);
 
-      // save logged user
-      localStorage.setItem("authData", JSON.stringify(data));
-      window.dispatchEvent(new Event("authDataChanged"));
+      await saveAuthData(data);
 
       if (onClose) onClose();
 

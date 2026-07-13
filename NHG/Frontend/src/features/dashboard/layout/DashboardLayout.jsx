@@ -1,6 +1,7 @@
 import { Home, LogOut } from "lucide-react";
 import { Outlet, NavLink, useNavigate } from "react-router-dom";
 import { getAuthData, hasRole, ROLE } from "../../../shared/utils/auth";
+import { clearAuthData } from "../../../utils/authStorage";
 import {
   DASHBOARD_LINKS,
   getDashboardLinkLabel,
@@ -14,8 +15,7 @@ function DashboardLayout() {
   const visibleLinks = DASHBOARD_LINKS.filter((link) => hasRole(link.roles, role));
 
   const handleLogout = () => {
-    localStorage.removeItem("authData");
-    window.dispatchEvent(new Event("authDataChanged"));
+    clearAuthData();
     navigate("/");
   };
 

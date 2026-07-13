@@ -1,3 +1,5 @@
+import { getStoredAuthDataSync } from "../../utils/authStorage";
+
 export const ROLE = {
   ADMIN: "ADMIN",
   CONSULTANT: "CONSULTANT",
@@ -13,7 +15,7 @@ export const normalizeRole = (role) => {
 
 export const getAuthData = () => {
   try {
-    const authData = JSON.parse(localStorage.getItem("authData") || "null");
+    const authData = getStoredAuthDataSync();
     if (!authData) return null;
 
     return {

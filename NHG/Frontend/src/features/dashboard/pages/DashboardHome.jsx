@@ -24,11 +24,6 @@ function DashboardHome() {
         <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
           {content.description}
         </p>
-        {authData?.id && (
-          <p className="mt-4 text-xs font-medium text-slate-500">
-            Logged in user ID: {authData.id}
-          </p>
-        )}
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
