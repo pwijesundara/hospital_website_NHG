@@ -224,6 +224,7 @@ public class AppointmentRequestService {
                 String.valueOf(session.getStartTime()),
                 String.valueOf(session.getEndTime()),
                 session.getLocation(),
+                fullName(clinic.getConsultant().getFirstName(), clinic.getConsultant().getLastName()),
                 request.getId()
         );
     }

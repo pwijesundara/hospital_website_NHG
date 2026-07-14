@@ -55,7 +55,13 @@ public class EmailService {
     }
 
     public void sendAppointmentAcceptedEmail(String toEmail, String patientName, String clinicName, String clinicDate,
-                                             String startTime, String endTime, String location, Long appointmentId) {
+                                             String startTime, String endTime, String location, String consultantName,
+                                             Long appointmentId) {
+        if (toEmail == null || toEmail.isBlank()) {
+            logger.warn("Cannot send appointment accepted email for appointment {} because patient email is missing", appointmentId);
+            return;
+        }
+
         JavaMailSender mailSender = mailSenderProvider.getIfAvailable();
         if (mailSender == null) {
             logger.warn("Mail sender is not configured. Appointment {} accepted for {}", appointmentId, toEmail);
@@ -67,20 +73,21 @@ public class EmailService {
             message.setFrom(fromEmail);
         }
         message.setTo(toEmail);
-        message.setSubject("Galle Hospital appointment accepted");
+        message.setSubject("Galle Hospital clinic request approved");
         message.setText("""
                 Dear %s,
 
-                Your appointment request has been accepted.
+                Your clinic request has been approved by the consultant.
 
-                Appointment ID: %s
+                Request ID: %s
                 Clinic: %s
+                Consultant: %s
                 Date: %s
                 Time: %s - %s
                 Location: %s
 
                 Please arrive on time with any relevant medical documents.
-                """.formatted(patientName, appointmentId, clinicName, clinicDate, startTime, endTime, location));
+                """.formatted(patientName, appointmentId, clinicName, consultantName, clinicDate, startTime, endTime, location));
 
         try {
             mailSender.send(message);
