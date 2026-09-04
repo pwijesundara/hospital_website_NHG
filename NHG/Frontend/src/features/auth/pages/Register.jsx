@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Plus, ArrowRight, X, CheckCircle2 } from 'lucide-react';
 import { registerUser } from '../services/authService';
+import PasswordInput from '../../../shared/components/PasswordInput';
 
 export default function Register({ onClose, onSwitchToLogin, onRegistrationSuccess }) {
   const accountType = 'patient';
@@ -247,8 +248,7 @@ export default function Register({ onClose, onSwitchToLogin, onRegistrationSucce
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label htmlFor="password" className="block text-xs font-semibold tracking-wide text-[#16243e] mb-1.5">PASSWORD</label>
-              <input
-                type="password"
+              <PasswordInput
                 id="password"
                 value={formData.password}
                 onChange={handleChange}
@@ -259,8 +259,7 @@ export default function Register({ onClose, onSwitchToLogin, onRegistrationSucce
             </div>
             <div>
               <label htmlFor="confirmPassword" className="block text-xs font-semibold tracking-wide text-[#16243e] mb-1.5">CONFIRM PASSWORD</label>
-              <input
-                type="password"
+              <PasswordInput
                 id="confirmPassword"
                 value={formData.confirmPassword}
                 onChange={handleChange}

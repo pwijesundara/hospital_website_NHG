@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { Plus, X } from "lucide-react";
 import { loginUser } from "../services/authService";
 import { saveAuthData } from "../../../utils/authStorage";
+import PasswordInput from "../../../shared/components/PasswordInput";
 
 export default function Login({ onClose, onSwitchToRegister }) {
   const [identifier, setIdentifier] = useState("");
@@ -117,8 +118,7 @@ export default function Login({ onClose, onSwitchToRegister }) {
               PASSWORD
             </label>
 
-            <input
-              type="password"
+            <PasswordInput
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Enter password"

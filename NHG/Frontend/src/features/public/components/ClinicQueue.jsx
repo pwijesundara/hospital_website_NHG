@@ -84,16 +84,6 @@ function ClinicQueue() {
               Today's Pharmacy Queue
             </h2>
           </div>
-
-          <a
-            href="#"
-            className="inline-flex items-center gap-1.5 text-sm font-semibold text-teal-800 hover:text-teal-600 transition-colors group"
-          >
-            <span>All departments</span>
-            <span className="transform group-hover:translate-x-0.5 transition-transform">
-              <ChevronRight />
-            </span>
-          </a>
         </div>
 
         {/* Counter Grid */}

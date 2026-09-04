@@ -4,6 +4,7 @@ import { ArrowLeft, KeyRound, Mail } from "lucide-react";
 import Navbar from "../../../shared/components/Navbar";
 import Footer from "../../../shared/components/Footer";
 import { forgotPassword, resetPassword } from "../services/authService";
+import PasswordInput from "../../../shared/components/PasswordInput";
 
 export default function ForgotPassword() {
   const [searchParams] = useSearchParams();
@@ -188,9 +189,8 @@ export default function ForgotPassword() {
                 <label htmlFor="newPassword" className="mb-2 block text-xs font-semibold tracking-wide text-[#16243e]">
                   NEW PASSWORD
                 </label>
-                <input
+                <PasswordInput
                   id="newPassword"
-                  type="password"
                   value={newPassword}
                   onChange={(event) => setNewPassword(event.target.value)}
                   placeholder="newpass123"
@@ -203,9 +203,8 @@ export default function ForgotPassword() {
                 <label htmlFor="confirmPassword" className="mb-2 block text-xs font-semibold tracking-wide text-[#16243e]">
                   CONFIRM PASSWORD
                 </label>
-                <input
+                <PasswordInput
                   id="confirmPassword"
-                  type="password"
                   value={confirmPassword}
                   onChange={(event) => setConfirmPassword(event.target.value)}
                   placeholder="newpass123"

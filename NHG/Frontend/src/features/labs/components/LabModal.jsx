@@ -1,5 +1,6 @@
 import { X } from "lucide-react";
 import LabField from "./LabField";
+import PasswordInput from "../../../shared/components/PasswordInput";
 
 export default function LabModal({
   mode,
@@ -106,8 +107,7 @@ export default function LabModal({
           {mode === "create" && (
             <>
               <LabField label="Password" error={errors.password}>
-                <input
-                  type="password"
+                <PasswordInput
                   value={form.password}
                   onChange={(event) => onChange("password", event.target.value)}
                   className="w-full rounded-lg border border-slate-200 px-4 py-2.5 text-sm outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
@@ -116,8 +116,7 @@ export default function LabModal({
               </LabField>
 
               <LabField label="Confirm Password" error={errors.confirmPassword}>
-                <input
-                  type="password"
+                <PasswordInput
                   value={form.confirmPassword}
                   onChange={(event) =>
                     onChange("confirmPassword", event.target.value)

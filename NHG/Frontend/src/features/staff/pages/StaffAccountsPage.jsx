@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Edit2, Search, Trash2, UserCog, X } from "lucide-react";
 import { registerNurseUser } from "../../auth/services/authService";
+import PasswordInput from "../../../shared/components/PasswordInput";
 import {
   deleteNurse,
   getAllNurses,
@@ -193,8 +194,7 @@ function StaffModal({
                   <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">
                     Password
                   </label>
-                  <input
-                    type="password"
+                  <PasswordInput
                     value={form.password}
                     onChange={(event) => onChange("password", event.target.value)}
                     className="w-full rounded-lg border border-slate-200 px-4 py-2.5 text-sm outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
@@ -208,8 +208,7 @@ function StaffModal({
                   <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">
                     Confirm Password
                   </label>
-                  <input
-                    type="password"
+                  <PasswordInput
                     value={form.confirmPassword}
                     onChange={(event) =>
                       onChange("confirmPassword", event.target.value)

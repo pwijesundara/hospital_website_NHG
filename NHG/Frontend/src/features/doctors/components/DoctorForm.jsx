@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Mail, Phone, MapPin, Award, Shield, FileText, Lock } from "lucide-react";
+import PasswordInput from "../../../shared/components/PasswordInput";
 
 const EMPTY = {
   firstName: "",
@@ -308,13 +309,12 @@ export default function DoctorForm({ form, setForm, onSubmit, editingDoctor, err
             <div className="flex flex-col gap-1.5">
               <label className="text-xs font-bold text-slate-700">Password</label>
               <div className="relative">
-                <Lock className="absolute left-4 top-[18px] text-slate-400" size={16} />
-                <input
-                  type="password"
+                <Lock className="absolute left-4 top-[18px] z-10 text-slate-400" size={16} />
+                <PasswordInput
                   placeholder="••••••••"
                   value={local.password}
                   onChange={(e) => change("password", e.target.value)}
-                  className={inputCls("border border-slate-200 h-13 pl-11 pr-5 rounded-xl w-full text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500", errors.password)}
+                  className={inputCls("border border-slate-200 h-13 pl-11 rounded-xl w-full text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500", errors.password)}
                 />
               </div>
               <FieldError message={errors.password} />
@@ -323,13 +323,12 @@ export default function DoctorForm({ form, setForm, onSubmit, editingDoctor, err
             <div className="flex flex-col gap-1.5">
               <label className="text-xs font-bold text-slate-700">Confirm Password</label>
               <div className="relative">
-                <Lock className="absolute left-4 top-[18px] text-slate-400" size={16} />
-                <input
-                  type="password"
+                <Lock className="absolute left-4 top-[18px] z-10 text-slate-400" size={16} />
+                <PasswordInput
                   placeholder="••••••••"
                   value={local.confirmPassword}
                   onChange={(e) => change("confirmPassword", e.target.value)}
-                  className={inputCls("border border-slate-200 h-13 pl-11 pr-5 rounded-xl w-full text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500", errors.confirmPassword)}
+                  className={inputCls("border border-slate-200 h-13 pl-11 rounded-xl w-full text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500", errors.confirmPassword)}
                 />
               </div>
               <FieldError message={errors.confirmPassword} />
