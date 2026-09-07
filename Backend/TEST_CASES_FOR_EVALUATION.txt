@@ -1,0 +1,151 @@
+================================================================================
+ UNIT TEST CASES FOR EVALUATION - Galle Hospital Management System (Backend)
+================================================================================
+
+File tested : Backend/src/test/java/com/management/galle_hospital/Service/UserServiceTest.java
+Class under test : com.management.galle_hospital.Service.UserService
+Test framework : JUnit 5 + Mockito + AssertJ
+Database needed : NONE (repositories are replaced by Mockito mock objects)
+
+
+--------------------------------------------------------------------------------
+ 1. WHAT WAS ADDED
+--------------------------------------------------------------------------------
+
+Two new unit tests were added to the existing UserServiceTest class:
+
+  #  Test method                                             What it proves
+  -  ------------------------------------------------------   ----------------------------------------------------
+  1  login_returns200WithIdAndRole_whenCredentialsAreCorrect  Correct email + password -> HTTP 200, and the
+                                                              response returns the user's id and role.
+  2  registerPatient_returns400_whenPasswordIsTooShort        A patient sign-up with a password under 8
+                                                              characters is refused with HTTP 400 and nothing
+                                                              is saved to the database.
+
+(The file also keeps the original test: login_returns401_whenEmailIsNotRegistered.)
+
+
+--------------------------------------------------------------------------------
+ 2. TEXT TO ADD TO YOUR REPORT
+--------------------------------------------------------------------------------
+
+5.x  Unit Testing
+
+Unit tests were written for UserService, the class that handles login and user
+registration. These are unit tests: the class is tested in isolation and its
+dependencies (database repositories, e-mail service) are replaced with Mockito
+mock objects. The tests need no running MySQL server and complete in about two
+seconds. JUnit 5 is the test runner and AssertJ provides the assertions.
+
+
+Test Case 1 - Successful login returns the user's role
+
+  Objective         Verify that valid credentials are accepted and that the API
+                    returns the information the frontend needs (user id and role).
+  Method under test UserService.login(UserLoginRequest)
+  Pre-condition     The mock repository is set up to hold one user,
+                    nurse@example.com, whose password is stored BCrypt-hashed
+                    (as in production), with role NURSE.
+  Input             email = nurse@example.com
+                    password = Nurse12345   (the correct password)
+  Expected result   HTTP status 200 OK; response body contains
+                    message = "Login successful", id = "42", role = "NURSE".
+  Actual result     As expected - PASS
+  Importance        Login is the entry point of the system. The returned role
+                    decides which dashboard (admin, doctor, patient, nurse, lab)
+                    the user sees, so this is the most business-critical happy path.
+
+
+Test Case 2 - Registration rejects a weak password
+
+  Objective         Verify that server-side validation blocks a password shorter
+                    than the 8-character minimum and that no partial/invalid
+                    account is persisted.
+  Method under test UserService.registerPatient(PatientRegistrationRequest)
+  Pre-condition     The mock repository reports that the e-mail john@example.com
+                    is not yet used.
+  Input             firstName = John
+                    mobile = 0771234567
+                    email = john@example.com
+                    password = abc12
+                    confirmPassword = abc12
+  Expected result   HTTP status 400 Bad Request; response body contains
+                    message = "Password must be at least 8 characters";
+                    the patient repository's save method is never called.
+  Actual result     As expected - PASS
+  Importance        The system has no Bean-Validation layer - all input rules are
+                    enforced manually inside the service. This test guards a
+                    security-relevant rule and also confirms that a rejected
+                    request leaves the database untouched.
+
+
+Test execution summary
+
+  Tests run: 3, Failures: 0, Errors: 0, Skipped: 0
+  BUILD SUCCESS
+
+
+--------------------------------------------------------------------------------
+ 3. HOW TO RUN THE TESTS
+--------------------------------------------------------------------------------
+
+All commands run from the Backend folder (the folder that contains pom.xml).
+
+
+OPTION A - Command line (Maven wrapper)
+
+  1. Make sure a JDK 17 or newer is set as JAVA_HOME.
+     On this machine JDK 21 is at C:\Program Files\Java\jdk-21
+     In PowerShell:
+
+        $env:JAVA_HOME = "C:\Program Files\Java\jdk-21"
+
+  2. Run just this test class:
+
+        .\mvnw.cmd test -Dtest=UserServiceTest
+
+  3. Run a single test case:
+
+        .\mvnw.cmd test "-Dtest=UserServiceTest#registerPatient_returns400_whenPasswordIsTooShort"
+
+  4. Run the whole test suite:
+
+        .\mvnw.cmd test
+
+  Look for "Tests run: 3, Failures: 0, Errors: 0" and "BUILD SUCCESS".
+  A full report is also written to:  Backend\target\surefire-reports\
+
+
+OPTION B - IDE (IntelliJ IDEA / Eclipse / VS Code)
+
+  1. Open the Backend folder as a Maven project; let it import dependencies.
+  2. Open:
+     src/test/java/com/management/galle_hospital/Service/UserServiceTest.java
+  3. Click the green run arrow next to the class name (runs all cases) or next
+     to a single method name (runs that one).
+  4. The test panel shows green ticks for passing tests; click a test to see
+     the expected-vs-actual detail.
+
+
+OPTION C - Show a failure on purpose (optional, for the demo)
+
+  1. In Test Case 2, temporarily change the expected message, e.g.
+        "Password must be at least 8 characters"   ->   "wrong text"
+  2. Re-run the test and show the red failure with the expected-vs-actual diff.
+  3. Restore the original text so the build passes again.
+
+
+--------------------------------------------------------------------------------
+ 4. WHY THESE TWO (talking points for the evaluation)
+--------------------------------------------------------------------------------
+
+  - They cover the two most-used features of any hospital system account: logging
+    in, and creating an account.
+  - One is a "happy path" (things work) and one is a "negative path" (bad input
+    is rejected) - together they show both sides of testing.
+  - They are fast and self-contained: no database, no network, run in ~2 seconds,
+    so they can be run live during the evaluation.
+  - Test Case 2 also asserts that NOTHING was saved when validation fails, which
+    demonstrates testing for side-effects, not just return values.
+
+================================================================================
