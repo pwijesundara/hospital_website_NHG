@@ -163,7 +163,7 @@ export default function BookAppointment() {
       <BookAppointmentForm
         form={form}
         uiLang={uiLang}
-        onToggleLang={() => setUiLang((prev) => (prev === "en" ? "si" : "en"))}
+        onSetLang={setUiLang}
         patientDetailsError={patientDetailsError}
         patientDetailsLoading={patientDetailsLoading}
         submitError={submitError}
