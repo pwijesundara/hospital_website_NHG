@@ -1,10 +1,15 @@
 package com.management.galle_hospital.Service;
 
+import com.management.galle_hospital.Model.AppointmentStatus;
 import com.management.galle_hospital.Model.LabReport;
 import com.management.galle_hospital.Model.Patient;
+import com.management.galle_hospital.Model.Role;
+import com.management.galle_hospital.Model.User;
 import com.management.galle_hospital.Payload.LabReportResponse;
+import com.management.galle_hospital.Repository.AppointmentRequestRepository;
 import com.management.galle_hospital.Repository.LabReportRepository;
 import com.management.galle_hospital.Repository.PatientRepository;
+import com.management.galle_hospital.Repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.ContentDisposition;
@@ -25,6 +30,8 @@ import java.util.Map;
 public class LabReportService {
     private final LabReportRepository labReportRepository;
     private final PatientRepository patientRepository;
+    private final UserRepository userRepository;
+    private final AppointmentRequestRepository appointmentRequestRepository;
 
     public ResponseEntity<?> submitReport(String patientPhoneNumber, String description, MultipartFile report) {
         if (isBlank(patientPhoneNumber) || isBlank(description) || report == null || report.isEmpty()) {
@@ -92,17 +99,68 @@ public class LabReportService {
 
     public ResponseEntity<?> downloadReport(Long reportId) {
         return labReportRepository.findById(reportId)
-                .<ResponseEntity<?>>map(report -> {
-                    ByteArrayResource resource = new ByteArrayResource(report.getReportPdf());
-                    String fileName = isBlank(report.getFileName()) ? "lab-report-" + report.getId() + ".pdf" : report.getFileName();
+                .<ResponseEntity<?>>map(this::pdfResponse)
+                .orElseGet(() -> error("Lab report not found", HttpStatus.NOT_FOUND));
+    }
 
-                    return ResponseEntity.ok()
-                            .contentType(MediaType.APPLICATION_PDF)
-                            .header(HttpHeaders.CONTENT_DISPOSITION, ContentDisposition.inline().filename(fileName).build().toString())
-                            .contentLength(report.getReportPdf().length)
-                            .body(resource);
+    public ResponseEntity<?> getReportsForDoctorPatient(Long doctorId, Long patientId) {
+        ResponseEntity<Map<String, String>> accessError = validateDoctorPatientAccess(doctorId, patientId);
+        if (accessError != null) {
+            return accessError;
+        }
+
+        return patientRepository.findById(patientId)
+                .<ResponseEntity<?>>map(patient -> ResponseEntity.ok(
+                        labReportRepository.findByPatientIdOrderBySubmittedAtDesc(patient.getId())
+                                .stream()
+                                .map(LabReportResponse::new)
+                                .toList()))
+                .orElseGet(() -> error("Patient not found", HttpStatus.NOT_FOUND));
+    }
+
+    public ResponseEntity<?> downloadReportForDoctor(Long doctorId, Long reportId) {
+        return labReportRepository.findById(reportId)
+                .<ResponseEntity<?>>map(report -> {
+                    Long patientId = report.getPatient() == null ? null : report.getPatient().getId();
+                    ResponseEntity<Map<String, String>> accessError = validateDoctorPatientAccess(doctorId, patientId);
+                    if (accessError != null) {
+                        return accessError;
+                    }
+                    return pdfResponse(report);
                 })
                 .orElseGet(() -> error("Lab report not found", HttpStatus.NOT_FOUND));
+    }
+
+    private ResponseEntity<?> pdfResponse(LabReport report) {
+        ByteArrayResource resource = new ByteArrayResource(report.getReportPdf());
+        String fileName = isBlank(report.getFileName()) ? "lab-report-" + report.getId() + ".pdf" : report.getFileName();
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_PDF)
+                .header(HttpHeaders.CONTENT_DISPOSITION, ContentDisposition.inline().filename(fileName).build().toString())
+                .contentLength(report.getReportPdf().length)
+                .body(resource);
+    }
+
+    private ResponseEntity<Map<String, String>> validateDoctorPatientAccess(Long doctorId, Long patientId) {
+        if (doctorId == null || patientId == null) {
+            return error("doctorId and patientId are required", HttpStatus.BAD_REQUEST);
+        }
+
+        User doctor = userRepository.findById(doctorId).orElse(null);
+        if (doctor == null) {
+            return error("Doctor not found", HttpStatus.NOT_FOUND);
+        }
+        if (doctor.getRole() != Role.DOCTOR) {
+            return error("doctorId must belong to a DOCTOR user", HttpStatus.BAD_REQUEST);
+        }
+
+        boolean patientRegisteredWithDoctor = appointmentRequestRepository
+                .existsByClinicSessionClinicDoctorsIdAndPatientIdAndStatus(doctorId, patientId, AppointmentStatus.ACCEPTED);
+        if (!patientRegisteredWithDoctor) {
+            return error("This patient is not registered to any of your clinic sessions", HttpStatus.FORBIDDEN);
+        }
+        return null;
     }
 
     private LabReport buildReport(Patient patient, String description, MultipartFile report, String reportSource) throws IOException {
