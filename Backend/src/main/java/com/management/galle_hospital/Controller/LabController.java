@@ -57,4 +57,20 @@ public class LabController {
     public ResponseEntity<?> downloadReport(@PathVariable Long reportId) {
         return labReportService.downloadReport(reportId);
     }
+
+    @GetMapping("/doctors/{doctorId}/patients/{patientId}/reports")
+    public ResponseEntity<?> getReportsForDoctorPatient(
+            @PathVariable Long doctorId,
+            @PathVariable Long patientId
+    ) {
+        return labReportService.getReportsForDoctorPatient(doctorId, patientId);
+    }
+
+    @GetMapping("/doctors/{doctorId}/reports/{reportId}/pdf")
+    public ResponseEntity<?> downloadReportForDoctor(
+            @PathVariable Long doctorId,
+            @PathVariable Long reportId
+    ) {
+        return labReportService.downloadReportForDoctor(doctorId, reportId);
+    }
 }

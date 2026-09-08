@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { CalendarDays, Clock, Mail, MapPin, Stethoscope, UserRound } from "lucide-react";
+import { CalendarDays, Clock, FileText, Mail, MapPin, Stethoscope, UserRound } from "lucide-react";
 import { getDoctorAcceptedAppointmentRequests } from "../../appointments/services/appointmentService";
 import { getAuthData } from "../../../shared/utils/auth";
+import DoctorPatientReports from "../../labs/components/DoctorPatientReports";
 
 const getAuthDoctorId = (authData) =>
   authData?.doctorId || authData?.doctorID || authData?.id || authData?.userId || "";
@@ -73,7 +74,17 @@ export default function DoctorSessionPatientsPage() {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [expandedPatients, setExpandedPatients] = useState(() => new Set());
   const groupedClinics = useMemo(() => groupRequestsByClinic(requests), [requests]);
+
+  const togglePatientReports = (patientId) => {
+    setExpandedPatients((prev) => {
+      const next = new Set(prev);
+      if (next.has(patientId)) next.delete(patientId);
+      else next.add(patientId);
+      return next;
+    });
+  };
 
   const fetchSessionPatients = useCallback(async () => {
     if (!doctorId) {
@@ -186,41 +197,65 @@ export default function DoctorSessionPatientsPage() {
                       {session.patients.map((request) => (
                         <div
                           key={request.id}
-                          className="grid gap-3 border-b border-slate-100 p-4 last:border-b-0 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)_auto]"
+                          className="border-b border-slate-100 last:border-b-0"
                         >
-                          <div className="flex gap-3">
-                            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald-50 text-emerald-700">
-                              <UserRound size={17} />
-                            </div>
-                            <div>
-                              <p className="font-semibold text-slate-900">
-                                {request.patientName || "Patient"}
-                              </p>
-                              {request.patientEmail && (
-                                <p className="mt-1 flex items-center gap-1.5 text-xs text-slate-400">
-                                  <Mail size={13} /> {request.patientEmail}
+                          <div className="grid gap-3 p-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)_auto]">
+                            <div className="flex gap-3">
+                              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald-50 text-emerald-700">
+                                <UserRound size={17} />
+                              </div>
+                              <div>
+                                <p className="font-semibold text-slate-900">
+                                  {request.patientName || "Patient"}
                                 </p>
+                                {request.patientEmail && (
+                                  <p className="mt-1 flex items-center gap-1.5 text-xs text-slate-400">
+                                    <Mail size={13} /> {request.patientEmail}
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+
+                            <div>
+                              <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                                Request Reason
+                              </p>
+                              <p className="mt-1 text-sm leading-6 text-slate-700">
+                                {request.description || request.reason || "-"}
+                              </p>
+                            </div>
+
+                            <div className="text-left lg:text-right">
+                              <span className="inline-flex rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700">
+                                {request.status || "ACCEPTED"}
+                              </span>
+                              <p className="mt-2 text-xs text-slate-400">
+                                Accepted: {formatDateTime(request.acceptedAt)}
+                              </p>
+                              {request.patientId && (
+                                <button
+                                  type="button"
+                                  onClick={() => togglePatientReports(request.patientId)}
+                                  className="mt-2 inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-600 transition hover:border-emerald-200 hover:bg-emerald-50 hover:text-emerald-700"
+                                >
+                                  <FileText size={13} />
+                                  {expandedPatients.has(request.patientId)
+                                    ? "Hide lab reports"
+                                    : "View lab reports"}
+                                </button>
                               )}
                             </div>
                           </div>
 
-                          <div>
-                            <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-                              Request Reason
-                            </p>
-                            <p className="mt-1 text-sm leading-6 text-slate-700">
-                              {request.description || request.reason || "-"}
-                            </p>
-                          </div>
-
-                          <div className="text-left lg:text-right">
-                            <span className="inline-flex rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700">
-                              {request.status || "ACCEPTED"}
-                            </span>
-                            <p className="mt-2 text-xs text-slate-400">
-                              Accepted: {formatDateTime(request.acceptedAt)}
-                            </p>
-                          </div>
+                          {request.patientId &&
+                            expandedPatients.has(request.patientId) && (
+                              <div className="border-t border-slate-100 bg-slate-50/70 p-4">
+                                <DoctorPatientReports
+                                  doctorId={doctorId}
+                                  patientId={request.patientId}
+                                />
+                              </div>
+                            )}
                         </div>
                       ))}
                     </div>

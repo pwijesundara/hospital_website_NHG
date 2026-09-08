@@ -117,6 +117,29 @@ export const getLabReportPdf = async (reportId) => {
   }
 };
 
+export const getDoctorPatientLabReports = async (doctorId, patientId) => {
+  try {
+    const response = await apiClient.get(
+      `/lab/doctors/${doctorId}/patients/${patientId}/reports`
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { message: "Failed to fetch patient lab reports" };
+  }
+};
+
+export const getDoctorLabReportPdf = async (doctorId, reportId) => {
+  try {
+    const response = await apiClient.get(
+      `/lab/doctors/${doctorId}/reports/${reportId}/pdf`,
+      { responseType: "blob" }
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { message: "Failed to fetch lab report PDF" };
+  }
+};
+
 export const getMyLabReports = async (patientId) => {
   try {
     const response = await apiClient.get(`/lab/patients/${patientId}/reports`);

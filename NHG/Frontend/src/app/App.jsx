@@ -34,6 +34,7 @@ const LabPage = lazy(() => import("../features/labs/pages/LabPage"));
 const StaffAccountsPage = lazy(() => import("../features/staff/pages/StaffAccountsPage"));
 const AppointmentRequestsPage = lazy(() => import("../features/dashboard/pages/AppointmentRequestsPage"));
 const DoctorSessionPatientsPage = lazy(() => import("../features/dashboard/pages/DoctorSessionPatientsPage"));
+const DoctorPatientReportsPage = lazy(() => import("../features/dashboard/pages/DoctorPatientReportsPage"));
 const CardiologyICU = lazy(() => import("../features/clinical specialities/cardiologyicu"));
 const Surgery = lazy(() => import("../features/clinical specialities/surgery"));
 const Laboratorypathology = lazy(() => import("../features/clinical specialities/laboratorypathology"));
@@ -109,6 +110,11 @@ const DASHBOARD_ROUTES = [
   {
     path: "session-patients",
     element: <DoctorSessionPatientsPage />,
+    roles: [ROLE.DOCTOR],
+  },
+  {
+    path: "patient-reports",
+    element: <DoctorPatientReportsPage />,
     roles: [ROLE.DOCTOR],
   },
 ];

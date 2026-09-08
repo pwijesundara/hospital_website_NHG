@@ -3,6 +3,7 @@ import {
   CalendarCheck,
   CalendarPlus,
   ClipboardList,
+  FileText,
   LayoutDashboard,
   Microscope,
   Stethoscope,
@@ -48,6 +49,12 @@ export const DASHBOARD_LINKS = [
     label: "Session Patients",
     to: "/dashboard/session-patients",
     icon: UserRound,
+    roles: [ROLE.DOCTOR],
+  },
+  {
+    label: "Patient Reports",
+    to: "/dashboard/patient-reports",
+    icon: FileText,
     roles: [ROLE.DOCTOR],
   },
   {
@@ -131,6 +138,12 @@ export const DASHBOARD_HOME_CONTENT = {
         description: "View accepted patients coming for your assigned sessions.",
         to: "/dashboard/session-patients",
         icon: UserRound,
+      },
+      {
+        title: "Patient Reports",
+        description: "View lab reports for patients registered to your clinic sessions.",
+        to: "/dashboard/patient-reports",
+        icon: FileText,
       },
       {
         title: "Patients",
