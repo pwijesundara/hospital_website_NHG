@@ -8,6 +8,7 @@ import {
 import "../App.css";
 import ProtectedRoute from "../components/ProtectedRoute";
 import LoadingFallback from "../shared/components/LoadingFallback";
+import ScrollToTop from "../shared/components/ScrollToTop";
 import { ROLE } from "../shared/utils/auth";
 
 const DashboardLayout = lazy(() => import("../features/dashboard/layout/DashboardLayout"));
@@ -122,6 +123,7 @@ const DASHBOARD_ROUTES = [
 function App() {
   return (
     <Router>
+      <ScrollToTop />
       <Suspense fallback={<LoadingFallback />}>
         <Routes>
           {PUBLIC_ROUTES.map(({ path, element }) => (
