@@ -7,6 +7,8 @@ import Navbar from "../../../shared/components/Navbar";
 import { requestAppointment } from "../services/appointmentService";
 import { getPatientById } from "../../patients/services/patientService";
 import { getAuthData } from "../../../shared/utils/auth";
+import { getAllClinicSessions, getAllClinics } from "../../clinics/services/clinicService";
+import { asArray, getEntityId } from "../../clinics/components/clinicUtils";
 
 const getAuthPatientId = (authData) =>
   authData?.patientId || authData?.patientID || authData?.id || authData?.userId || "";
@@ -44,6 +46,10 @@ export default function BookAppointment() {
   );
   const [submitLoading, setSubmitLoading] = useState(false);
   const [submitError, setSubmitError] = useState("");
+  const [sessions, setSessions] = useState([]);
+  const [clinicById, setClinicById] = useState({});
+  const [sessionsLoading, setSessionsLoading] = useState(true);
+  const [sessionsError, setSessionsError] = useState("");
   const [refNo] = useState(
     () => "NHG-" + Math.floor(100000 + Math.random() * 900000)
   );
@@ -89,10 +95,61 @@ export default function BookAppointment() {
     };
   }, []);
 
+  useEffect(() => {
+    let ignore = false;
+
+    const fetchClinicSessions = async () => {
+      try {
+        setSessionsLoading(true);
+        setSessionsError("");
+        const [sessionData, clinicData] = await Promise.all([
+          getAllClinicSessions(),
+          getAllClinics(),
+        ]);
+        if (ignore) return;
+        setSessions(asArray(sessionData));
+        setClinicById(
+          asArray(clinicData).reduce((map, clinic) => {
+            map[String(getEntityId(clinic))] = clinic;
+            return map;
+          }, {})
+        );
+      } catch (error) {
+        if (!ignore) {
+          setSessions([]);
+          setClinicById({});
+          setSessionsError(error.message || "Failed to load clinic sessions.");
+        }
+      } finally {
+        if (!ignore) {
+          setSessionsLoading(false);
+        }
+      }
+    };
+
+    fetchClinicSessions();
+
+    return () => {
+      ignore = true;
+    };
+  }, []);
+
   const set = (key) => (event) => {
     const value =
       event.target.type === "checkbox" ? event.target.checked : event.target.value;
-    setForm((currentForm) => ({ ...currentForm, [key]: value }));
+    setForm((currentForm) => {
+      const nextForm = { ...currentForm, [key]: value };
+      if (key === "type") {
+        const session = sessions.find(
+          (item) => String(getEntityId(item)) === String(value)
+        );
+        nextForm.date = session?.clinicDate
+          ? String(session.clinicDate).slice(0, 10)
+          : "";
+        nextForm.time = "";
+      }
+      return nextForm;
+    });
   };
 
   const handleSubmit = async (event) => {
@@ -164,6 +221,10 @@ export default function BookAppointment() {
         form={form}
         uiLang={uiLang}
         onSetLang={setUiLang}
+        sessions={sessions}
+        clinicById={clinicById}
+        sessionsLoading={sessionsLoading}
+        sessionsError={sessionsError}
         patientDetailsError={patientDetailsError}
         patientDetailsLoading={patientDetailsLoading}
         submitError={submitError}

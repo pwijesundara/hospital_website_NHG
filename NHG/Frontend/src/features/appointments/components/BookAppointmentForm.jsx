@@ -18,6 +18,10 @@ export default function BookAppointmentForm({
   form,
   uiLang,
   onSetLang,
+  sessions,
+  clinicById,
+  sessionsLoading,
+  sessionsError,
   patientDetailsError,
   patientDetailsLoading,
   submitError,
@@ -65,10 +69,20 @@ export default function BookAppointmentForm({
         />
         <AppointmentTypeSection
           selectedType={form.type}
+          sessions={sessions}
+          clinicById={clinicById}
+          loading={sessionsLoading}
+          error={sessionsError}
           t={t}
           onChange={onChange}
         />
-        <ScheduleSection form={form} t={t} uiLang={uiLang} onChange={onChange} />
+        <ScheduleSection
+          form={form}
+          sessions={sessions}
+          t={t}
+          uiLang={uiLang}
+          onChange={onChange}
+        />
         <MedicalContextSection
           reason={form.reason}
           t={t}

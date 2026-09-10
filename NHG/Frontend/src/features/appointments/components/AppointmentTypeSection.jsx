@@ -1,59 +1,19 @@
-import { useEffect, useState } from "react";
-import { getAllClinicSessions, getAllClinics } from "../../clinics/services/clinicService";
 import {
-  asArray,
   getEntityId,
   getSessionClinicId,
   normalizeTime,
 } from "../../clinics/components/clinicUtils";
 import { IconWrapper, SectionHeader } from "./bookAppointmentUi";
 
-export default function AppointmentTypeSection({ selectedType, t, onChange }) {
-  const [sessions, setSessions] = useState([]);
-  const [clinicById, setClinicById] = useState({});
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-
-  useEffect(() => {
-    let ignore = false;
-
-    const fetchClinicSessions = async () => {
-      try {
-        setLoading(true);
-        setError("");
-        const [sessionData, clinicData] = await Promise.all([
-          getAllClinicSessions(),
-          getAllClinics(),
-        ]);
-        if (!ignore) {
-          setSessions(asArray(sessionData));
-          setClinicById(
-            asArray(clinicData).reduce((map, clinic) => {
-              map[String(getEntityId(clinic))] = clinic;
-              return map;
-            }, {})
-          );
-        }
-      } catch (err) {
-        if (!ignore) {
-          setSessions([]);
-          setClinicById({});
-          setError(err.message || "Failed to load clinic sessions.");
-        }
-      } finally {
-        if (!ignore) {
-          setLoading(false);
-        }
-      }
-    };
-
-    fetchClinicSessions();
-
-    return () => {
-      ignore = true;
-    };
-  }, []);
-
+export default function AppointmentTypeSection({
+  selectedType,
+  sessions,
+  clinicById,
+  loading,
+  error,
+  t,
+  onChange,
+}) {
   return (
     <div className="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-sm">
       <SectionHeader

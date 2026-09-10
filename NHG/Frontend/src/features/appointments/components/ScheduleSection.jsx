@@ -1,9 +1,41 @@
-import { prefLangs, timeSlots } from "../data/bookAppointmentData";
+import { getEntityId, normalizeTime } from "../../clinics/components/clinicUtils";
+import { prefLangs } from "../data/bookAppointmentData";
 import { prefLangDisplay } from "../data/bookAppointmentI18n";
 import { Field, inputBase, SectionHeader } from "./bookAppointmentUi";
 
-export default function ScheduleSection({ form, t, uiLang, onChange }) {
+const SLOT_MINUTES = 10;
+
+const toMinutes = (time) => {
+  const [hours, minutes] = time.split(":").map(Number);
+  return hours * 60 + minutes;
+};
+
+const toClock = (total) =>
+  `${String(Math.floor(total / 60)).padStart(2, "0")}:${String(total % 60).padStart(2, "0")}`;
+
+const buildSlots = (start, end) => {
+  if (!start || !end) return [];
+  const slots = [];
+  for (let minute = toMinutes(start); minute <= toMinutes(end); minute += SLOT_MINUTES) {
+    slots.push(toClock(minute));
+  }
+  return slots;
+};
+
+export default function ScheduleSection({ form, sessions, t, uiLang, onChange }) {
   const langLabels = prefLangDisplay[uiLang] || prefLangDisplay.en;
+
+  const selectedSession = (sessions || []).find(
+    (session) => String(getEntityId(session)) === String(form.type)
+  );
+  const sessionStart = normalizeTime(selectedSession?.startTime);
+  const sessionEnd = normalizeTime(selectedSession?.endTime);
+  const availableSlots = selectedSession
+    ? buildSlots(sessionStart, sessionEnd)
+    : [];
+  const lockedFieldClass = selectedSession
+    ? inputBase
+    : `${inputBase} opacity-60 cursor-not-allowed`;
 
   return (
     <div className="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-sm">
@@ -16,7 +48,11 @@ export default function ScheduleSection({ form, t, uiLang, onChange }) {
         <Field
           label={t.schedule.date}
           required
-          hint={t.schedule.dateHint}
+          hint={
+            selectedSession
+              ? t.schedule.dateLockedHint
+              : t.schedule.pickClinicFirst
+          }
         >
           <input
             type="date"
@@ -24,18 +60,31 @@ export default function ScheduleSection({ form, t, uiLang, onChange }) {
             onChange={onChange("date")}
             min={new Date().toISOString().split("T")[0]}
             required
-            className={inputBase}
+            readOnly={Boolean(selectedSession)}
+            disabled={!selectedSession}
+            className={lockedFieldClass}
           />
         </Field>
-        <Field label={t.schedule.time} required>
+        <Field
+          label={t.schedule.time}
+          required
+          hint={
+            selectedSession
+              ? `${t.schedule.sessionWindow}: ${sessionStart || "--:--"} - ${
+                  sessionEnd || "--:--"
+                }`
+              : t.schedule.pickClinicFirst
+          }
+        >
           <select
             value={form.time}
             onChange={onChange("time")}
             required
-            className={inputBase}
+            disabled={!selectedSession}
+            className={lockedFieldClass}
           >
             <option value="">{t.schedule.timePlaceholder}</option>
-            {timeSlots.map((time) => (
+            {availableSlots.map((time) => (
               <option key={time} value={time}>
                 {time} {t.schedule.hrs}
               </option>
