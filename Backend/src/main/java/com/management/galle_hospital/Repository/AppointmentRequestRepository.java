@@ -23,5 +23,7 @@ public interface AppointmentRequestRepository extends JpaRepository<AppointmentR
 
     boolean existsByPatientIdAndClinicSessionIdAndStatus(Long patientId, Long clinicSessionId, AppointmentStatus status);
 
+    boolean existsByClinicSessionIdAndStatus(Long clinicSessionId, AppointmentStatus status);
+
     boolean existsByClinicSessionClinicDoctorsIdAndPatientIdAndStatus(Long doctorId, Long patientId, AppointmentStatus status);
 }

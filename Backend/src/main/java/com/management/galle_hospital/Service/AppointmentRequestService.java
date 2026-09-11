@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -30,6 +31,7 @@ public class AppointmentRequestService {
     private final UserRepository userRepository;
     private final EmailService emailService;
 
+    @Transactional
     public ResponseEntity<?> createAppointmentRequest(AppointmentRequestCreateRequest request) {
         if (request.getPatientId() == null || request.getClinicSessionId() == null) {
             return error("patientId and clinicSessionId are required", HttpStatus.BAD_REQUEST);
@@ -50,13 +52,24 @@ public class AppointmentRequestService {
             return error("Clinic session does not have an assigned nurse", HttpStatus.BAD_REQUEST);
         }
 
+        // Lock the session row so two patients racing to request the same slot serialize:
+        // the second request re-checks after the first commits, instead of both reading
+        // "not taken yet" at the same time.
+        Long clinicSessionId = clinicSessionRepository.findByIdForUpdate(clinicSession.getId())
+                .map(ClinicSession::getId)
+                .orElse(clinicSession.getId());
+
         if (appointmentRequestRepository.existsByPatientIdAndClinicSessionIdAndStatus(
-                patient.getId(), clinicSession.getId(), AppointmentStatus.PENDING)) {
+                patient.getId(), clinicSessionId, AppointmentStatus.PENDING)) {
             return error("Patient already has a pending request for this clinic session", HttpStatus.BAD_REQUEST);
         }
         if (appointmentRequestRepository.existsByPatientIdAndClinicSessionIdAndStatus(
-                patient.getId(), clinicSession.getId(), AppointmentStatus.ACCEPTED)) {
+                patient.getId(), clinicSessionId, AppointmentStatus.ACCEPTED)) {
             return error("Patient already has an accepted appointment for this clinic session", HttpStatus.BAD_REQUEST);
+        }
+        if (appointmentRequestRepository.existsByClinicSessionIdAndStatus(clinicSessionId, AppointmentStatus.PENDING)
+                || appointmentRequestRepository.existsByClinicSessionIdAndStatus(clinicSessionId, AppointmentStatus.ACCEPTED)) {
+            return error("This time slot has already been requested by another patient", HttpStatus.BAD_REQUEST);
         }
 
         AppointmentRequest appointmentRequest = new AppointmentRequest();
@@ -115,6 +128,7 @@ public class AppointmentRequestService {
         return ResponseEntity.ok(requests.stream().map(AppointmentRequestResponse::new).toList());
     }
 
+    @Transactional
     public ResponseEntity<?> acceptRequest(Long requestId, Long nurseId) {
         ResponseEntity<Map<String, String>> nurseError = validateNurse(nurseId);
         if (nurseError != null) {
@@ -129,7 +143,16 @@ public class AppointmentRequestService {
                     if (request.getStatus() != AppointmentStatus.PENDING) {
                         return error("Only pending appointment requests can be accepted", HttpStatus.BAD_REQUEST);
                     }
-                    ResponseEntity<Map<String, String>> capacityError = validateCapacity(request.getClinicSession());
+
+                    // Lock the clinic session row so that if two accept requests for the same
+                    // session race each other, the second one blocks here until the first
+                    // commits, then re-checks capacity against the up-to-date accepted count
+                    // instead of a stale read.
+                    ClinicSession lockedSession = clinicSessionRepository
+                            .findByIdForUpdate(request.getClinicSession().getId())
+                            .orElse(request.getClinicSession());
+
+                    ResponseEntity<Map<String, String>> capacityError = validateCapacity(lockedSession);
                     if (capacityError != null) {
                         return capacityError;
                     }
